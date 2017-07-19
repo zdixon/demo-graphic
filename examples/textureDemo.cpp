@@ -1,5 +1,5 @@
-#include "bsg.h"
-#include "bsgMenagerie.h"
+#include "bsg/bsg.h"
+#include "bsg/bsgMenagerie.h"
 
 // The scene and the objects in it must be available from the main()
 // function where it is created and the renderScene() function where

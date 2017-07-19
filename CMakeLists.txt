@@ -99,6 +99,8 @@ endif()
 
 set(img_src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+add_subdirectory(src/bsg)
 add_subdirectory(src)
+
 add_subdirectory(examples)
 

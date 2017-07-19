@@ -1,4 +1,4 @@
-#include "bsg.h"
+#include "bsg/bsg.h"
 
 #include <api/MinVR.h>
 

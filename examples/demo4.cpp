@@ -1,5 +1,5 @@
-#include "bsg.h"
-#include "bsgMenagerie.h"
+#include "bsg/bsg.h"
+#include "bsg/bsgMenagerie.h"
 
 #include <api/MinVR.h>
 

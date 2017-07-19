@@ -1,24 +1,30 @@
-project(bsg)
+# Use this file for compiling the examples.
 
-include_directories(
-  ${OPENGL_INCLUDE_DIR}
-  ${FREEGLUT_INCLUDE_DIR}
-  ${GLM_INCLUDE_DIR}
-  ${GLEW_INCLUDE_DIRS}
-  ${PNG_INCLUDE_DIRS}
-  )
+  if(MINVR_FOUND)
+    # Redefine the include directories to include MinVR.
+    include_directories(
+      ${OPENGL_INCLUDE_DIR}
+      ${FREEGLUT_INCLUDE_DIR}
+      ${GLM_INCLUDE_DIR}
+      ${GLEW_INCLUDE_DIRS}
+      ${MINVR_INCLUDE_DIR})
 
-set(bsg_headers bsg.h bsgMenagerie.h bsgObjModel.h)
-set(bsg_sources bsg.cpp bsgMenagerie.cpp bsgObjModel.cpp)
-set(bsg_files ${bsg_headers} ${bsg_sources})
+  
+    add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp)
 
-add_library(bsg ${bsg_files})
+    target_link_libraries(main bsg
+     ${MINVR_LIBRARY}
+     ${FREEGLUT_LIBRARY}
+     ${OPENGL_LIBRARY}
+     ${GLEW_LIBRARY})
+
+  else(MINVR_FOUND)
+
+    message("** No MinVR for you!")
+    message("** See instructions and advice on the topic above.")
+
+  endif(MINVR_FOUND)
+#endif(PNG_FOUND)
 
 
-install(TARGETS bsg
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-
-install(FILES ${bsg_headers}
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-
+                    

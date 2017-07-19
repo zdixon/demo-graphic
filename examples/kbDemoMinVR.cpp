@@ -1,6 +1,6 @@
-#include "bsg.h"
-#include "bsgMenagerie.h"
-#include "bsgObjModel.h"
+#include "bsg/bsg.h"
+#include "bsg/bsgMenagerie.h"
+#include "bsg/bsgObjModel.h"
 
 #include <api/MinVR.h>
 
