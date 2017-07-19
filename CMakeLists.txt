@@ -72,6 +72,10 @@ find_package(FreeGLUT REQUIRED)
 message("-- FreeGLUT includes:" ${FREEGLUT_INCLUDE_DIR})
 message("-- FreeGLUT library: " ${FREEGLUT_LIBRARY})
 
+find_package(Freetype REQUIRED)
+message("-- Freetype includes:" ${FREETYPE_INCLUDE_DIR})
+message("-- Freetype library: " ${FREETYPE_LIBRARY})
+
 find_package(MinVR MODULE)
 message("-- MinVR includes:   " ${MINVR_INCLUDE_DIR})
 message("-- MinVR library:    " ${MINVR_LIBRARY})

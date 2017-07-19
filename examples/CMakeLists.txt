@@ -6,6 +6,7 @@ target_link_libraries(demo
   ${FREEGLUT_LIBRARY}
   ${OPENGL_LIBRARY}
   ${GLEW_LIBRARY}
+  ${FREETYPE_LIBRARY}
 )
 
 include_directories(
@@ -62,7 +63,8 @@ include_directories(
       ${FREEGLUT_INCLUDE_DIR}
       ${GLM_INCLUDE_DIR}
       ${GLEW_INCLUDE_DIRS}
-      ${MINVR_INCLUDE_DIR})
+      ${MINVR_INCLUDE_DIR}
+	  ${FREETYPE_INCLUDE_DIRS})
 
     add_executable(demo3 demo3.cpp)
   
@@ -78,7 +80,8 @@ include_directories(
      ${MINVR_LIBRARY}
      ${FREEGLUT_LIBRARY}
      ${OPENGL_LIBRARY}
-     ${GLEW_LIBRARY})
+     ${GLEW_LIBRARY}
+	 ${FREETYPE_LIBRARY})
     
     add_executable(textureDemoMinVR textureDemoMinVR.cpp)
 

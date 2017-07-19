@@ -2,6 +2,8 @@
 #include "bsgMenagerie.h"
 
 #include <api/MinVR.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class DemoVRApp: public MinVR::VRApp {
 
@@ -43,7 +45,99 @@ private:
   std::string _vertexFile;
   std::string _fragmentFile;
 
+
+  FT_Library _ft_library;
+  FT_Face     _ft_face;      /* handle to face object */
   
+  struct Character {
+	  GLuint     TextureID;  // ID handle of the glyph texture
+	  glm::ivec2 Size;       // Size of glyph
+	  glm::ivec2 Bearing;    // Offset from baseline to left/top of glyph
+	  GLuint     Advance;    // Offset to advance to next glyph
+  };
+
+  std::map<GLchar, Character> Characters;
+
+  void _initializeCharacters() {
+	  glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
+
+	  for (GLubyte c = 0; c < 128; c++)
+	  {
+		  // Load character glyph 
+		  if (FT_Load_Char(_ft_face, c, FT_LOAD_RENDER))
+		  {
+			  std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+			  continue;
+		  }
+		  // Generate texture
+		  GLuint texture;
+		  glGenTextures(1, &texture);
+		  glBindTexture(GL_TEXTURE_2D, texture);
+		  glTexImage2D(
+			  GL_TEXTURE_2D,
+			  0,
+			  GL_RED,
+			  _ft_face->glyph->bitmap.width,
+			  _ft_face->glyph->bitmap.rows,
+			  0,
+			  GL_RED,
+			  GL_UNSIGNED_BYTE,
+			  _ft_face->glyph->bitmap.buffer
+		  );
+		  // Set texture options
+		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		  // Now store character for later use
+		  Character character = {
+			  texture,
+			  glm::ivec2(_ft_face->glyph->bitmap.width, _ft_face->glyph->bitmap.rows),
+			  glm::ivec2(_ft_face->glyph->bitmap_left, _ft_face->glyph->bitmap_top),
+			  _ft_face->glyph->advance.x
+		  };
+		  Characters.insert(std::pair<GLchar, Character>(c, character));
+	  }
+  }
+
+  void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
+  {
+	  // Activate corresponding render state	
+	  bsg::textureMgr *texture = new bsg::textureMgr();
+
+	  _shader->addTexture(texture);
+
+	  glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
+
+	  // Iterate through all characters
+	  std::string::const_iterator c;
+	  for (c = text.begin(); c != text.end(); c++)
+	  {
+		  Character ch = Characters[*c];
+
+		  GLfloat xpos = x + ch.Bearing.x * scale;
+		  GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+		  GLfloat w = ch.Size.x * scale;
+		  GLfloat h = ch.Size.y * scale;
+		  // Update VBO for each character
+		  GLfloat vertices[6][4] = {
+			  { xpos,     ypos + h,   0.0, 0.0 },
+			  { xpos,     ypos,       0.0, 1.0 },
+			  { xpos + w, ypos,       1.0, 1.0 },
+
+			  { xpos,     ypos + h,   0.0, 0.0 },
+			  { xpos + w, ypos,       1.0, 1.0 },
+			  { xpos + w, ypos + h,   1.0, 0.0 }
+		  };
+
+		  texture->_textureBufferID = ch.TextureID;
+
+		  // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+		  x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+	  }
+  }
+
   // These functions from demo2.cpp are not needed here:
   //
   //    init()
@@ -279,6 +373,8 @@ public:
 
       //bsg::bsgUtils::printMat("view", viewMatrix);
       _scene.draw(viewMatrix, projMatrix);
+	  RenderText("Testing", 0, 0, 2.0, glm::vec3(1.0, 0.0, 0.0));
+
 
       // We let MinVR swap the graphics buffers.
       // glutSwapBuffers();

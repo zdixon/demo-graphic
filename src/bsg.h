@@ -399,12 +399,14 @@ class textureMgr {
     _textureAttribName = std::string("textureImage");
   };
 
-  GLuint _textureBufferID;
 
   GLuint _loadPNG(const std::string imagePath);
   GLuint _loadCheckerBoard (const int size, int numFields);
   
  public:
+  
+  GLuint _textureBufferID;
+
   textureMgr() { _setupDefaultNames(); };
 
   /// \brief Reads a texture from an image file.
@@ -432,6 +434,8 @@ class textureMgr {
   GLfloat getWidth() { return _width; };
   /// \brief Return the texture height.
   GLfloat getHeight() { return _height; };
+
+
 };
 
 
