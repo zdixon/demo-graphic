@@ -12,7 +12,7 @@ class DemoVRApp: public MinVR::VRApp {
 private:
 
 	DBHandler _dbhandler;
-	Dimension<string> _d;
+	Dimension<int> _d;
 
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where

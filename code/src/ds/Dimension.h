@@ -79,6 +79,9 @@ public:
 	// set the operator
 	void setOperator(string str);
 
+	// sort
+	void sort();
+
 protected:
 	std::string _name;
 	// the set is an inner structure to check if an element is distinguishable

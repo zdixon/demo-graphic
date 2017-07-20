@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 template<typename T>
 Dimension<T>::Dimension() :
@@ -111,6 +112,7 @@ void Dimension<T>::addValue(T v) {
 
 		// added it to vector
 		_valueVector.push_back(v);
+		sort();
 	}
 }
 
@@ -172,9 +174,14 @@ template<typename T>
 void Dimension<T>::setOperator(string o) {
 	_operator = o;
 }
+template<typename T>
+void Dimension<T>::sort() {
+	std::sort(_valueVector.begin(), _valueVector.end(), std::less<T>());
+}
 
 template class Dimension<string> ;
 template class Dimension<int> ;
 template class Dimension<float> ;
 template class Dimension<double> ;
+// define whatever you need here
 

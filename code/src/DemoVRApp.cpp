@@ -16,7 +16,7 @@
 DemoVRApp::DemoVRApp(int argc, char** argv) :
 				MinVR::VRApp(argc, argv),
 				_dbhandler(DBHandler()),
-				_d(Dimension<string>("Test", "1")) {
+				_d(Dimension<int>("Test", 5)) {
 
 	// This is the root of the scene graph.
 	bsg::scene _scene = bsg::scene();
@@ -159,7 +159,8 @@ void DemoVRApp::_initializeScene() {
 	//------------------------------------------------------------------------
 	//------------------------------------------------------------------------
 
-	_d.addValue("2");
+	_d.addValue(2);
+	_d.addValue(8);
 	_d.print();
 }
 
