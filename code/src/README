@@ -1,0 +1,8 @@
+Fumeng's add-ups
+
+1. I tried to compile the project using a higher version of CMake.
+2. When compiling locally, I try to compile it to an Eclispe project.
+If you don't have eclipse CDT install, the compiling may fail
+3. When adding code, I recommend (1) adding a CMakeLists.txt to that directory
+(2) add the directory to the most outer cmakelists
+(3) add the library to the cmakelists.txt with the exe entry

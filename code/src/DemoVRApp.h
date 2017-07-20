@@ -1,14 +1,18 @@
 #include "bsg/bsg.h"
 #include "bsg/bsgMenagerie.h"
 #include "bsg/bsgObjModel.h"
+#include "db/DBHandler.h"
+#include "ds/Dimension.h"
 
 #include <api/MinVR.h>
 
 class DemoVRApp: public MinVR::VRApp {
 
-	// Data values that were global in the demo2.cpp file are defined as
 	// private members of the VRApp.
 private:
+
+	DBHandler _dbhandler;
+	Dimension<string> _d;
 
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where
@@ -79,7 +83,7 @@ public:
 	/// context.
 	void onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderState);
 
-	/// \brief Draw the image.
+	/// brief draw the image.
 	///
 	/// This is the heart of any graphics program, the render function.
 	/// It is called each time through the main graphics loop, and

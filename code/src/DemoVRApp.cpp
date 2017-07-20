@@ -1,4 +1,8 @@
 #include "DemoVRApp.h"
+#include "ds/Dimension.h"
+#include <string>
+#include <sstream>
+#include <iostream>
 
 // These functions from demo2.cpp are not needed here:
 //
@@ -8,6 +12,24 @@
 //    ... also most of the processKeys() methods.
 //
 // The functionality of these methods is assumed by the MinVR apparatus.
+
+DemoVRApp::DemoVRApp(int argc, char** argv) :
+				MinVR::VRApp(argc, argv),
+				_dbhandler(DBHandler()),
+				_d(Dimension<string>("Test", "1")) {
+
+	// This is the root of the scene graph.
+	bsg::scene _scene = bsg::scene();
+
+	// These are tracked separately because multiple objects might use
+	// them.
+	_shader = new bsg::shaderMgr();
+	_axesShader = new bsg::shaderMgr();
+	_lights = new bsg::lightList();
+
+	_oscillator = 0.0f;
+
+}
 
 // This contains a bunch of sanity checks from the graphics
 // initialization of demo2.cpp.  They are still useful with MinVR.
@@ -78,8 +100,8 @@ void DemoVRApp::_initializeScene() {
 	// Create a shader manager and load the light list.
 	_shader->addLights(_lights);
 
-	_vertexFile = "../shaders/textureShader.vp";
-	_fragmentFile = "../shaders/textureShader.fp";
+	_vertexFile = "../code/shaders/textureShader.vp";
+	_fragmentFile = "../code/shaders/textureShader.fp";
 
 	// Add the shaders to the manager, first the vertex shader...
 	_shader->addShader(bsg::GLSHADER_VERTEX, _vertexFile);
@@ -114,9 +136,10 @@ void DemoVRApp::_initializeScene() {
 	_modelGroup->setPosition(glm::vec3(0.0f, 0.0f, -10.0f));
 	_scene.addObject(_modelGroup);
 
-	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shaderSimple.vp");
+	_axesShader->addShader(bsg::GLSHADER_VERTEX,
+			"../code/shaders/shaderSimple.vp");
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT,
-			"../shaders/shaderSimple.fp");
+			"../code/shaders/shaderSimple.fp");
 	_axesShader->compileShaders();
 
 	_axesSet = new bsg::drawableAxes(_axesShader, 100.0f);
@@ -124,22 +147,20 @@ void DemoVRApp::_initializeScene() {
 	// Now add the axes.
 	_scene.addObject(_axesSet);
 
+	//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
+	// test for database
 	// All the shapes are now added to the scene.
-}
+	_dbhandler.getConnection();
+	_dbhandler.exeQuery("select * from BDC_KPI_DIM;");
+	_dbhandler.closeConnection();
+	//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
 
-DemoVRApp::DemoVRApp(int argc, char** argv) :
-		MinVR::VRApp(argc, argv) {
-
-	// This is the root of the scene graph.
-	bsg::scene _scene = bsg::scene();
-
-	// These are tracked separately because multiple objects might use
-	// them.
-	_shader = new bsg::shaderMgr();
-	_axesShader = new bsg::shaderMgr();
-	_lights = new bsg::lightList();
-
-	_oscillator = 0.0f;
+	_d.addValue("2");
+	_d.print();
 }
 
 /// The MinVR apparatus invokes this method whenever there is a new
@@ -216,8 +237,7 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 
 		// First clear the display.
 		glClear(
-				GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
-						| GL_STENCIL_BUFFER_BIT);
+		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		// Second the load() step.  We let MinVR give us the projection
 		// matrix from the render state argument to this method.

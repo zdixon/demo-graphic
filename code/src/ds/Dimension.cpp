@@ -3,16 +3,178 @@
  *
  *  Created on: Jul 20, 2017
  *      Author: fm
+ *      Email: fy@brown.edu
  */
 
-#include <ds/Dimension.h>
+#include "Dimension.h"
+#include <stdexcept>
+#include <iostream>
+#include <string>
 
-Dimension::Dimension() {
-	// TODO Auto-generated constructor stub
+template<typename T>
+Dimension<T>::Dimension() :
+				_name(0),
+				_valueSet(set<T>()),
+				_valueVector(vector<T>()),
+				_path(vector<string>()),
+				_operator("sum") {
 
 }
 
-Dimension::~Dimension() {
-	// TODO Auto-generated destructor stub
+template<typename T>
+Dimension<T>::Dimension(string name) :
+				_name(name),
+				_valueSet(set<T>()),
+				_valueVector(vector<T>()),
+				_path(vector<string>()),
+				_operator("sum") {
+
 }
+
+template<typename T>
+Dimension<T>::Dimension(string name, T value) :
+				_name(name),
+				_valueSet(set<T>()),
+				_valueVector(vector<T>()),
+				_path(vector<string>()),
+				_operator("sum") {
+	_valueSet.insert(value);
+	_valueVector.push_back(value);
+}
+
+template<typename T>
+Dimension<T>::~Dimension() {
+
+}
+
+template<typename T>
+string Dimension<T>::getName() {
+	return _name;
+}
+
+template<typename T>
+T Dimension<T>::getValueAt(int i) {
+	if (_valueVector.size() < i - 1) {
+		throw std::out_of_range("i");
+	}
+	return _valueVector.at(i);
+}
+
+template<typename T>
+void Dimension<T>::getValues(vector<T> & vs) {
+	vs = _valueVector;
+}
+
+template<typename T>
+void Dimension<T>::getPath(vector<string> & p) {
+	p = _path;
+}
+
+template<typename T>
+void Dimension<T>::print() {
+	std::cout << "Dimension (" << _name << "," << getSize() << ")" << std::endl;
+	printValues();
+	printPath();
+}
+
+template<typename T>
+void Dimension<T>::printPath() {
+	string str = "";
+	//! c++11 features
+	for (string s : _path) {
+		str += s + "->";
+	}
+	std::cout << "Path: " << str << std::endl;
+}
+
+template<typename T>
+void Dimension<T>::printValues() {
+	string str = "";
+	//! c++11 features
+	std::cout << "values: ";
+	for (T s : _valueVector) {
+		std::cout << s << ",";
+	}
+	std::cout << std::endl;
+}
+
+template<typename T>
+int Dimension<T>::getSize() {
+	return _valueVector.size();
+}
+
+template<typename T>
+void Dimension<T>::addValue(T v) {
+	if (_valueSet.find(v) == _valueSet.end()) {
+		// check if we have this value
+		_valueSet.insert(v);
+
+		// added it to vector
+		_valueVector.push_back(v);
+	}
+}
+
+template<typename T>
+void Dimension<T>::addPath(string p) {
+	_path.push_back(p);
+}
+
+template<typename T>
+void Dimension<T>::setName(string str) {
+	_name = str;
+}
+
+/*
+ * get the first value, should be also the min
+ */
+template<typename T>
+T Dimension<T>::getFirstValue() {
+	if (!_valueVector.empty()) {
+		return _valueVector.front();
+	} else {
+		throw std::out_of_range("vector too small : ");
+	}
+	return 0;
+}
+
+/*
+ * get the last value, should be also the max
+ */
+template<typename T>
+T Dimension<T>::getLastValue() {
+	if (!_valueVector.empty()) {
+		return _valueVector.back();
+	} else {
+		throw std::out_of_range("vector too small : ");
+	}
+	return 0;
+}
+
+/*
+ * get where am i in the traces
+ */
+template<typename T>
+string Dimension<T>::getCurrentLevel() {
+	if (!_path.empty()) {
+		return _path.back();
+	} else {
+		throw std::out_of_range("path too short : ");
+	}
+	return 0;
+}
+
+template<typename T>
+string Dimension<T>::getOperator() {
+	return _operator;
+}
+
+template<typename T>
+void Dimension<T>::setOperator(string o) {
+	_operator = o;
+}
+
+template class Dimension<string> ;
+template class Dimension<int> ;
+template class Dimension<float> ;
+template class Dimension<double> ;
 

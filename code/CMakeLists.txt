@@ -76,11 +76,19 @@ find_package(MinVR MODULE)
 message("-- MinVR includes:   " ${MINVR_INCLUDE_DIR})
 message("-- MinVR library:    " ${MINVR_LIBRARY})
 
+#set(GLM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/glm-0.9.7.1)
+message("-- GLM includes:     " ${GLM_INCLUDE_DIR})
+
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code -- Not sure why pthreads or dl is required.  This
   # is not necessary on all systems.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl -fPIC -lpthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl -fPIC -lpthread -lmysqlcppconn")
+  
+  set(MYSQL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/mysql/linux32/include")
+  set(MYSQL_INCLUDE_CPPCONN_DIR "${CMAKE_SOURCE_DIR}/external/mysql/linux32/include/cppconn")
+  set(MYSQL_LIBRARY "${CMAKE_SOURCE_DIR}/external/mysql/linux32/lib")
+  set(DYLD_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/external/mysql/linux32/lib")
   
 #  set(CMAKE_C_COMPILER gcc)
 #  set(CMAKE_CXX_COMPILER g++)
@@ -89,7 +97,11 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # Apple-specific code
-  set(CMAKE_CXX_FLAGS "-DOSX")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOSX -lmysqlcppconn ")
+  set(MYSQL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include")
+  set(MYSQL_INCLUDE_CPPCONN_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include/cppconn")
+  set(MYSQL_LIBRARY "${CMAKE_SOURCE_DIR}/external/mysql/macos/lib")
+  set(DYLD_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/external/mysql/macos/lib")
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -97,9 +109,15 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     CACHE PATH "default install path" FORCE )
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${MYSQL_LIBRARY}")
+message("-- MYSQL includes: " ${MYSQL_INCLUDE_DIR})
+message("-- MYSQL library: " ${MYSQL_LIBRARY})
+
 set(img_src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(src/bsg)
+add_subdirectory(src/ds)
+add_subdirectory(src/db)
 add_subdirectory(src)
 
 # add_subdirectory(examples)

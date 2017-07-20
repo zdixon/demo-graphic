@@ -1,5 +1,5 @@
  # Use this file for compiling the examples.
-
+ 
   if(MINVR_FOUND)
     # Redefine the include directories to include MinVR.
     include_directories(
@@ -7,12 +7,15 @@
       ${FREEGLUT_INCLUDE_DIR}
       ${GLM_INCLUDE_DIR}
       ${GLEW_INCLUDE_DIRS}
-      ${MINVR_INCLUDE_DIR})
-
+      ${MINVR_INCLUDE_DIR}
+      ${MYSQL_INCLUDE_DIR}
+      ${MYSQL_INCLUDE_CPPCONN_DIR}
+      ${MYSQL_LIBRARY}
+  )
   
     add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp)
 
-    target_link_libraries(main bsg
+    target_link_libraries(main bsg ds db
      ${MINVR_LIBRARY}
      ${FREEGLUT_LIBRARY}
      ${OPENGL_LIBRARY}
