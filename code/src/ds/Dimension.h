@@ -14,7 +14,7 @@
 #include <iostream>
 #include <set>
 #include <vector>
-
+typedef bool empty;
 using namespace std;
 
 template<typename T>
@@ -84,15 +84,17 @@ public:
 
 protected:
 	std::string _name;
-	// the set is an inner structure to check if an element is distinguishable
+
+	// the set is an inner structure to check if elements are distinguishable
 	set<T> _valueSet;
 
+	// the structure to store actually data
 	vector<T> _valueVector;
 
 	// store the path of values
 	vector<string> _path;
 
-	// the operator we wanna apply
+	// the operator we wanna apply, by default, it is "sum"
 	string _operator;
 
 	// print set for debug purposes

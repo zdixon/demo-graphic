@@ -6,7 +6,6 @@
  */
 
 #include "DBHandler.h"
-#include "DBHandler.h"
 
 DBHandler::DBHandler() :
 		m_stmt(0), m_con(0) {

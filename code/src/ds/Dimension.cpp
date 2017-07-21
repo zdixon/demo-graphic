@@ -94,7 +94,7 @@ void Dimension<T>::printValues() {
 	//! c++11 features
 	std::cout << "values: ";
 	for (T s : _valueVector) {
-		std::cout << s << ",";
+		std::cout << str << ",";
 	}
 	std::cout << std::endl;
 }
@@ -136,7 +136,6 @@ T Dimension<T>::getFirstValue() {
 	} else {
 		throw std::out_of_range("vector too small : ");
 	}
-	return 0;
 }
 
 /*
@@ -149,7 +148,6 @@ T Dimension<T>::getLastValue() {
 	} else {
 		throw std::out_of_range("vector too small : ");
 	}
-	return 0;
 }
 
 /*
@@ -165,23 +163,35 @@ string Dimension<T>::getCurrentLevel() {
 	return 0;
 }
 
+/*
+ *
+ */
 template<typename T>
 string Dimension<T>::getOperator() {
 	return _operator;
 }
 
+/*
+ *
+ */
 template<typename T>
 void Dimension<T>::setOperator(string o) {
 	_operator = o;
 }
+
+/*
+ *
+ */
 template<typename T>
 void Dimension<T>::sort() {
 	std::sort(_valueVector.begin(), _valueVector.end(), std::less<T>());
 }
 
+/*
+ * define whatever you need here
+ */
 template class Dimension<string> ;
 template class Dimension<int> ;
 template class Dimension<float> ;
-template class Dimension<double> ;
-// define whatever you need here
+template class Dimension<empty> ;
 

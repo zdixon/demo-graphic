@@ -15,19 +15,11 @@
 
 DemoVRApp::DemoVRApp(int argc, char** argv) :
 				MinVR::VRApp(argc, argv),
-				_dbhandler(DBHandler()),
-				_d(Dimension<int>("Test", 5)) {
-
-	// This is the root of the scene graph.
-	bsg::scene _scene = bsg::scene();
-
-	// These are tracked separately because multiple objects might use
-	// them.
-	_shader = new bsg::shaderMgr();
-	_axesShader = new bsg::shaderMgr();
-	_lights = new bsg::lightList();
-
-	_oscillator = 0.0f;
+				_scene(bsg::scene()),
+				_shader(new bsg::shaderMgr()),
+				_axesShader(new bsg::shaderMgr()),
+				_lights(new bsg::lightList()),
+				_oscillator(0.0f) {
 
 }
 
@@ -147,21 +139,6 @@ void DemoVRApp::_initializeScene() {
 	// Now add the axes.
 	_scene.addObject(_axesSet);
 
-	//------------------------------------------------------------------------
-	//------------------------------------------------------------------------
-	//------------------------------------------------------------------------
-	// test for database
-	// All the shapes are now added to the scene.
-	_dbhandler.getConnection();
-	_dbhandler.exeQuery("select * from BDC_KPI_DIM;");
-	_dbhandler.closeConnection();
-	//------------------------------------------------------------------------
-	//------------------------------------------------------------------------
-	//------------------------------------------------------------------------
-
-	_d.addValue(2);
-	_d.addValue(8);
-	_d.print();
 }
 
 /// The MinVR apparatus invokes this method whenever there is a new

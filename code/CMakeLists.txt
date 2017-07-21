@@ -116,8 +116,9 @@ message("-- MYSQL library: " ${MYSQL_LIBRARY})
 set(img_src_dir ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(src/bsg)
-add_subdirectory(src/ds)
 add_subdirectory(src/db)
+add_subdirectory(src/ds)
+add_subdirectory(src/adapter)
 add_subdirectory(src)
 
 # add_subdirectory(examples)

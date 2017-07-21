@@ -10,10 +10,6 @@ class DemoVRApp: public MinVR::VRApp {
 
 	// private members of the VRApp.
 private:
-
-	DBHandler _dbhandler;
-	Dimension<int> _d;
-
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where
 	// it is drawn.  The scene object contains all the drawable objects
