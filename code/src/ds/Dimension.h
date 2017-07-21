@@ -14,6 +14,7 @@
 #include <iostream>
 #include <set>
 #include <vector>
+
 typedef bool empty;
 using namespace std;
 

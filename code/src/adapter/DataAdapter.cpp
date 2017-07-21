@@ -11,7 +11,6 @@
  */
 DataAdapter::DataAdapter() :
 		_dbhandler(DBHandler()), _isOpen(false) {
-	// TODO Auto-generated constructor stub
 
 }
 
@@ -19,7 +18,7 @@ DataAdapter::DataAdapter() :
  *
  */
 DataAdapter::~DataAdapter() {
-	// TODO Auto-generated destructor stub
+
 }
 
 /**
