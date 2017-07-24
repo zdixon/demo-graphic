@@ -9,7 +9,6 @@
 
 DBHandler::DBHandler() :
 		m_stmt(0), m_con(0) {
-	// TODO Auto-generated constructor stub
 
 }
 
@@ -29,12 +28,11 @@ void DBHandler::closeConnection() {
 			delete m_con;
 		}
 
-		std::cout << "Close connection." << std::endl;
+		std::cout << "Close connection..." << std::endl;
 
 	} catch (sql::SQLException &e) {
 
 		//   MySQL Connector/C++ throws three different exceptions:
-
 		//   - sql::MethodNotImplementedException (derived from sql::SQLException)
 		//   - sql::InvalidArgumentException (derived from sql::SQLException)
 		//   - sql::SQLException (derived from std::runtime_error)
@@ -47,8 +45,8 @@ void DBHandler::closeConnection() {
 		std::cout << " (MySQL error code: " << e.getErrorCode();
 		std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
 	}
-
 }
+
 int DBHandler::getConnection() {
 	std::string url(EXAMPLE_HOST);
 	const std::string user(EXAMPLE_USER);
@@ -91,27 +89,30 @@ int DBHandler::getConnection() {
 }
 
 sql::ResultSet* DBHandler::exeQuery(std::string sql) {
-	try {
-		sql::ResultSet *res;
-		res = m_stmt->executeQuery(sql);
-		while (res->next()) {
-			std::cout << "\t... MySQL replies: ";
-			/* Access column data by alias or column name */
-			std::cout << res->getString("KPI_TYPE_ID") << std::endl;
-			std::cout << "\t... MySQL says it again: ";
-			/* Access column data by numeric offset, 1 is the first column */
-			std::cout << res->getString(2) << std::endl;
+	if (sql != "") {
+		std::cout << "final sql is " << sql << std::endl;
+		try {
+			sql::ResultSet *res;
+			res = m_stmt->executeQuery(sql);
+//			while (res->next()) {
+//				std::cout << "    ... MySQL replies: ";
+//				/* Access column data by alias or column name */
+//				std::cout << res->getString("Value") << std::endl;
+//				std::cout << "    ... MySQL says it again: ";
+//				/* Access column data by numeric offset, 1 is the first column */
+//				std::cout << res->getString(1) << std::endl;
+//			}
+			return res;
+		} catch (sql::SQLException &e) {
+			std::cout << "# ERR: SQLException in " << __FILE__;
+			std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__
+					<< std::endl;
+			/* what() (derived from std::runtime_error) fetches error message */
+			std::cout << "# ERR: " << e.what();
+			std::cout << " (MySQL error code: " << e.getErrorCode();
+			std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+			return 0;
 		}
-		return res;
-	} catch (sql::SQLException &e) {
-		std::cout << "# ERR: SQLException in " << __FILE__;
-		std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__
-				<< std::endl;
-		/* what() (derived from std::runtime_error) fetches error message */
-		std::cout << "# ERR: " << e.what();
-		std::cout << " (MySQL error code: " << e.getErrorCode();
-		std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-		return 0;
 	}
 }
 

@@ -2,7 +2,7 @@
 *~
 
 # Stuff in build or if there's a CVS
-build/
+build/*
 !build/*.sh
 CVS/
 Win32/

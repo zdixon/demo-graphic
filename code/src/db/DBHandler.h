@@ -21,7 +21,7 @@
 #define EXAMPLE_HOST "makeithappen.cs.brown.edu"
 #define EXAMPLE_USER "dbuser"
 #define EXAMPLE_PASS "dbpassword"
-#define EXAMPLE_DB "FidelityDS"
+#define EXAMPLE_DB "Sensors"
 
 class DBHandler {
 public:

@@ -19,6 +19,20 @@ struct InterfaceData {
 		floatDimension = vector<Dimension<float> >();
 		stringDimension = vector<Dimension<string> >();
 	}
+	void print() {
+		cout << "all int dimensions: " << endl;
+		for (Dimension<int> id : intDimension) {
+			id.print();
+		}
+		cout << "\nall float dimensions: " << endl;
+		for (Dimension<float> fd : floatDimension) {
+			fd.print();
+		}
+		cout << "\nall string dimensions: " << endl;
+		for (Dimension<string> sd : stringDimension) {
+			sd.print();
+		}
+	}
 };
 
 #endif /* SRC_DS_INTERFACEDATA_H_ */

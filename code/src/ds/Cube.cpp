@@ -12,10 +12,11 @@
  */
 Cube::Cube() :
 				_interfaceDims(InterfaceData()),
-				_cubes(vector<CubeCell>()),
+				_cubeDims(InterfaceData()),
+				_subCubes(vector<CubeCell>()),
 				_adapter(DataAdapter()) {
+	cout << "initialize a cube" << endl;
 	_adapter.open();
-
 }
 /**
  *
@@ -23,18 +24,35 @@ Cube::Cube() :
 Cube::~Cube() {
 	_adapter.close();
 }
+
 /**
  *
  */
-void Cube::setInterfaceDimensions() {
+void Cube::setInterfaceDimensions(InterfaceData & interfaceDims) {
+	_interfaceDims = interfaceDims;
+}
+
+/**
+ *
+ */
+void Cube::setInterfaceDimensions(vector<Dimension<int> > ids,
+		vector<Dimension<float> > fds, vector<Dimension<string> > sds) {
+	_interfaceDims.floatDimension = fds;
+	_interfaceDims.intDimension = ids;
+	_interfaceDims.stringDimension = sds;
 }
 
 /**
  *
  */
 void Cube::queryDatabase() {
+	_adapter.getResult(_interfaceDims, _cubeDims);
+	computerCubes();
 }
 
+void Cube::printData() {
+	_cubeDims.print();
+}
 /**
  *
  */

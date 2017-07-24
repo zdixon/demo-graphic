@@ -19,9 +19,12 @@ public:
 	Cube();
 	virtual ~Cube();
 
-	void setInterfaceDimensions();
+	void setInterfaceDimensions(InterfaceData & interfaceDims);
+	void setInterfaceDimensions(vector<Dimension<int> > ids,
+			vector<Dimension<float> > fds, vector<Dimension<string> > sds);
 	void queryDatabase();
 	void computerCubes();
+	void printData();
 
 private:
 	/*
@@ -29,7 +32,7 @@ private:
 	 */
 	InterfaceData _interfaceDims;
 	InterfaceData _cubeDims;
-	vector<CubeCell> _cubes;
+	vector<CubeCell> _subCubes;
 	DataAdapter _adapter;
 };
 

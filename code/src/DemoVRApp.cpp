@@ -19,7 +19,26 @@ DemoVRApp::DemoVRApp(int argc, char** argv) :
 				_shader(new bsg::shaderMgr()),
 				_axesShader(new bsg::shaderMgr()),
 				_lights(new bsg::lightList()),
-				_oscillator(0.0f) {
+				_oscillator(0.0f),
+				_testCube(Cube()){
+}
+
+void DemoVRApp::test() {
+	vector<Dimension<int> > ids = vector<Dimension<int> >();
+	vector<Dimension<float> > fds = vector<Dimension<float> >();
+	vector<Dimension<string> > sds = vector<Dimension<string> >();
+
+	// test if year works
+	cout << "test Years" << endl;
+	Dimension<string> sd1 = Dimension<string>("Year", "2012");
+	sd1.addPath("Year");
+	sd1.setOperator("AVG");
+	sds.push_back(sd1);
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+
 
 }
 
@@ -138,7 +157,6 @@ void DemoVRApp::_initializeScene() {
 
 	// Now add the axes.
 	_scene.addObject(_axesSet);
-
 }
 
 /// The MinVR apparatus invokes this method whenever there is a new

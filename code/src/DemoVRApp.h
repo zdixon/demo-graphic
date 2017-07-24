@@ -1,8 +1,8 @@
 #include "bsg/bsg.h"
 #include "bsg/bsgMenagerie.h"
 #include "bsg/bsgObjModel.h"
-#include "db/DBHandler.h"
 #include "ds/Dimension.h"
+#include "ds/Cube.h"
 
 #include <api/MinVR.h>
 
@@ -10,6 +10,7 @@ class DemoVRApp: public MinVR::VRApp {
 
 	// private members of the VRApp.
 private:
+	Cube _testCube;
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where
 	// it is drawn.  The scene object contains all the drawable objects
@@ -65,6 +66,8 @@ private:
 	void _initializeScene();
 
 public:
+	void test();
+
 	DemoVRApp(int argc, char** argv);
 
 	/// The MinVR apparatus invokes this method whenever there is a new

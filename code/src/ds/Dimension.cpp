@@ -12,6 +12,9 @@
 #include <string>
 #include <algorithm>
 
+/**
+ *
+ */
 template<typename T>
 Dimension<T>::Dimension() :
 				_name(0),
@@ -21,7 +24,9 @@ Dimension<T>::Dimension() :
 				_operator("sum") {
 
 }
-
+/**
+ *
+ */
 template<typename T>
 Dimension<T>::Dimension(string name) :
 				_name(name),
@@ -31,7 +36,9 @@ Dimension<T>::Dimension(string name) :
 				_operator("sum") {
 
 }
-
+/**
+ *
+ */
 template<typename T>
 Dimension<T>::Dimension(string name, T value) :
 				_name(name),
@@ -42,17 +49,23 @@ Dimension<T>::Dimension(string name, T value) :
 	_valueSet.insert(value);
 	_valueVector.push_back(value);
 }
-
+/**
+ *
+ */
 template<typename T>
 Dimension<T>::~Dimension() {
 
 }
-
+/**
+ *
+ */
 template<typename T>
 string Dimension<T>::getName() {
 	return _name;
 }
-
+/**
+ *
+ */
 template<typename T>
 T Dimension<T>::getValueAt(int i) {
 	if (_valueVector.size() < i - 1) {
@@ -60,24 +73,32 @@ T Dimension<T>::getValueAt(int i) {
 	}
 	return _valueVector.at(i);
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::getValues(vector<T> & vs) {
 	vs = _valueVector;
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::getPath(vector<string> & p) {
 	p = _path;
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::print() {
 	std::cout << "Dimension (" << _name << "," << getSize() << ")" << std::endl;
 	printValues();
 	printPath();
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::printPath() {
 	string str = "";
@@ -87,23 +108,29 @@ void Dimension<T>::printPath() {
 	}
 	std::cout << "Path: " << str << std::endl;
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::printValues() {
 	string str = "";
 	//! c++11 features
 	std::cout << "values: ";
 	for (T s : _valueVector) {
-		std::cout << str << ",";
+		std::cout << s << ",";
 	}
 	std::cout << std::endl;
 }
-
+/**
+ *
+ */
 template<typename T>
 int Dimension<T>::getSize() {
 	return _valueVector.size();
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::addValue(T v) {
 	if (_valueSet.find(v) == _valueSet.end()) {
@@ -115,12 +142,16 @@ void Dimension<T>::addValue(T v) {
 		sort();
 	}
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::addPath(string p) {
 	_path.push_back(p);
 }
-
+/**
+ *
+ */
 template<typename T>
 void Dimension<T>::setName(string str) {
 	_name = str;
@@ -205,7 +236,6 @@ void Dimension<T>::setValues(vector<T> ts) {
 	_valueVector = ts;
 	_valueSet = set<T>(_valueVector.begin(), _valueVector.end());
 }
-
 
 /*
  * define whatever you need here
