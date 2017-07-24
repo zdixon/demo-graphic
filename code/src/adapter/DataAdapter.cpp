@@ -49,41 +49,7 @@ void DataAdapter::close() {
 /**
  *
  */
-void DataAdapter::getResult(SQL sql) {
+void DataAdapter::getResult(InterfaceData interDims, InterfaceData & cubeDims) {
+
 }
 
-/**
- *
- */
-void DataAdapter::addDimensionToSQL(SQL & sql, Dimension<int> d) {
-}
-
-/**
- *
- */
-void DataAdapter::addDimensionToSQL(SQL & sql, Dimension<float> d) {
-}
-
-/**
- *
- */
-void DataAdapter::addDimensionToSQL(SQL & sql, Dimension<string> d) {
-}
-
-/**
- *
- */
-void DataAdapter::addDimensionsToSQL(SQL & sql, vector<Dimension<int> > ds) {
-}
-
-/**
- *
- */
-void DataAdapter::addDimensionsToSQL(SQL & sql, vector<Dimension<float> > ds) {
-}
-
-/**
- *
- */
-void DataAdapter::addDimensionsToSQL(SQL & sql, vector<Dimension<string> > ds) {
-}

@@ -4,8 +4,8 @@ include_directories(
       ${GLM_INCLUDE_DIR}
   )
 
-set(ds_headers Dimension.h CubeCell.h DataStruct.h) 
-set(ds_sources Dimension.cpp)
+set(ds_headers Dimension.h CubeCell.h InterfaceData.h) 
+set(ds_sources Dimension.cpp CubeCell.cpp)
 set(ds_files ${ds_headers} ${ds_sources})
 
 add_library(ds ${ds_files})

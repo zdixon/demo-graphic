@@ -74,11 +74,17 @@ public:
 	// add a level to the path
 	void addPath(string p);
 
+	// remove last one
+	void removeLastItemOnPath();
+
 	// set the name of the dimension
 	void setName(string str);
 
 	// set the operator
 	void setOperator(string str);
+
+	// set all values
+	void setValues(vector<T>);
 
 	// sort
 	void sort();

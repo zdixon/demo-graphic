@@ -188,6 +188,26 @@ void Dimension<T>::sort() {
 }
 
 /*
+ *
+ */
+template<typename T>
+void Dimension<T>::removeLastItemOnPath() {
+	if (_path.size() > 0) {
+		_path.pop_back();
+	}
+}
+
+/*
+ *
+ */
+template<typename T>
+void Dimension<T>::setValues(vector<T> ts) {
+	_valueVector = ts;
+	_valueSet = set<T>(_valueVector.begin(), _valueVector.end());
+}
+
+
+/*
  * define whatever you need here
  */
 template class Dimension<string> ;

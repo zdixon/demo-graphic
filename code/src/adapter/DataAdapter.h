@@ -13,6 +13,7 @@
 #include <vector>
 #include "../db/DBHandler.h"
 #include "../ds/Dimension.h"
+#include "../ds/InterfaceData.h"
 
 struct SQL {
 	std::string select = "";
@@ -29,13 +30,7 @@ public:
 	virtual ~DataAdapter();
 	void open();
 	void close();
-	void getResult(SQL sql);
-	void addDimensionToSQL(SQL & sql, Dimension<int>);
-	void addDimensionToSQL(SQL & sql, Dimension<string>);
-	void addDimensionToSQL(SQL & sql, Dimension<float>);
-	void addDimensionsToSQL(SQL & sql, vector<Dimension<int> >);
-	void addDimensionsToSQL(SQL & sql, vector<Dimension<string> >);
-	void addDimensionsToSQL(SQL & sql, vector<Dimension<float> >);
+	void getResult(InterfaceData interDims, InterfaceData & cubeDims);
 	bool isOpen();
 private:
 	bool _isOpen;
