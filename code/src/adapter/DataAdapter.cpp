@@ -174,7 +174,6 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 			}
 
 		} else if (s == "business") {
-
 			if (c == "top") {
 				// doing nothing
 				// we just have one level
@@ -293,6 +292,9 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				counter++;
 			}
 		} else if (s == "value") {
+			/**
+			 *add a fake dimension to init select and set operator
+			 */
 			sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'"
 					+ sql.select;
 			sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI"

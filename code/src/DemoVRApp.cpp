@@ -31,7 +31,7 @@ void DemoVRApp::test() {
 	// add a fake dimension
 	Dimension<string> value = Dimension<string>("Value");
 	value.addPath("top");
-	value.setOperator("SUM");
+	value.setOperator("MAX");
 
 	/**
 	 * 1.default: year x value
@@ -56,7 +56,7 @@ void DemoVRApp::test() {
 	yearTime.addNonRepValue("2013");
 	yearTime.addPath("Top");
 	yearTime.addPath("Year");
-	yearTime.setOperator("SUM");
+
 	sds.clear();
 	sds.push_back(yearTime);
 	sds.push_back(value); // add a fake dimension
@@ -73,7 +73,7 @@ void DemoVRApp::test() {
 	monthTime.addPath("Top");
 	monthTime.addPath("Year");
 	monthTime.addPath("Month");
-	monthTime.setOperator("SUM");
+
 	sds.clear();
 	sds.push_back(monthTime);
 	sds.push_back(value); // add a fake dimension
@@ -91,7 +91,7 @@ void DemoVRApp::test() {
 	dayTime.addPath("Year");
 	dayTime.addPath("Month");
 	dayTime.addPath("Day");
-	dayTime.setOperator("SUM");
+
 	sds.clear();
 	sds.push_back(dayTime);
 	sds.push_back(value); // add a fake dimension
@@ -105,11 +105,9 @@ void DemoVRApp::test() {
 	cout << "========Test when looking year and business========" << endl;
 	Dimension<string> time = Dimension<string>("Time");
 	time.addPath("Top");
-	time.setOperator("SUM");
 
 	Dimension<string> business = Dimension<string>("Business");
 	business.addPath("Top");
-	business.setOperator("SUM");
 
 	sds.clear();
 	sds.push_back(time);
@@ -128,12 +126,11 @@ void DemoVRApp::test() {
 			"New_money");
 	businessSecond.addPath("Top");
 	businessSecond.addPath("Business_Type");
-	businessSecond.setOperator("SUM");
 
 	Dimension<string> timeSecond = Dimension<string>("Time", "2012");
 	timeSecond.addPath("Top");
 	timeSecond.addPath("Year");
-	timeSecond.setOperator("SUM");
+
 	sds.clear();
 	sds.push_back(timeSecond);
 	sds.push_back(businessSecond);
@@ -150,7 +147,6 @@ void DemoVRApp::test() {
 			<< endl;
 	Dimension<string> moneyCag = Dimension<string>("Money_Category");
 	moneyCag.addPath("Top");
-	moneyCag.setOperator("SUM");
 
 	sds.clear();
 	sds.push_back(time);
@@ -172,7 +168,6 @@ void DemoVRApp::test() {
 			"Retirement");
 	moneyCoarse.addPath("Top");
 	moneyCoarse.addPath("Coarse");
-	moneyCoarse.setOperator("SUM");
 
 	sds.clear();
 	sds.push_back(time);
@@ -190,11 +185,11 @@ void DemoVRApp::test() {
 	cout
 			<< "========Test when looking year, business, and money (and look at a mid money_category)========"
 			<< endl;
+	// using dash as a seperator
 	Dimension<string> moneyMid = Dimension<string>("Money_Category",
 			"Retirement-Retire_TOA");
 	moneyMid.addPath("Top");
 	moneyMid.addPath("Mid");
-	moneyMid.setOperator("MAX");
 
 	sds.clear();
 	sds.push_back(time);
@@ -214,7 +209,6 @@ void DemoVRApp::test() {
 			<< endl;
 	Dimension<string> accout = Dimension<string>("Account_Type");
 	accout.addPath("Top");
-	accout.setOperator("MAX");
 
 	sds.clear();
 	sds.push_back(time);
@@ -237,7 +231,6 @@ void DemoVRApp::test() {
 			"SMALL BUSINESS");
 	accoutNext.addPath("Top");
 	accoutNext.addPath("Account_Next");
-	accoutNext.setOperator("MAX");
 
 	sds.clear();
 	sds.push_back(time);
