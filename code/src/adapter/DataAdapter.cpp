@@ -6,6 +6,7 @@
  */
 #include <algorithm>   // transform()
 #include <cctype>      // toupper(), tolower()
+#include <boost/algorithm/string.hpp>
 #include "DataAdapter.h"
 /**
  *
@@ -69,11 +70,7 @@ void DataAdapter::getResult(InterfaceData & interDims,
  * This function is customized
  */
 void DataAdapter::setSQLTemplate(SQL & sql) {
-	sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'";
-	sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI";
-	sql.where = "WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID";
-	sql.groupBy = "GROUP BY 'Time'";
-	sql.orderBy = "ORDER BY 'Time'";
+
 }
 /**
  *
@@ -109,8 +106,7 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				/**
 				 * This is the default one: year against sum of values
 				 */
-				sql.select =
-						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time'";
+				sql.select += " ,DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%Y')";
 				counter++;
@@ -126,8 +122,8 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				}
 				str = str.substr(0, str.length() - 1) + ")";
 				sql.where += str;
-				sql.select =
-						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%m') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y') as 'Year'";
+				sql.select +=
+						", DATE_FORMAT(SNAPSHOT_D, '%m') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y') as 'Year'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%m')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m')";
 				counter++;
@@ -144,8 +140,8 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				str = str.substr(0, str.length() - 1) + ")";
 				sql.where += str;
 
-				sql.select =
-						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%d') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m') as 'Month'";
+				sql.select +=
+						", DATE_FORMAT(SNAPSHOT_D, '%d') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m') as 'Month'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%d')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%d')";
 
@@ -166,8 +162,8 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				dayStr = "'" + dayStr.substr(0, dayStr.length() - 1) + "'";
 				sql.where += str;
 
-				sql.select =
-						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%H') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') as 'Day'";
+				sql.select +=
+						", DATE_FORMAT(SNAPSHOT_D, '%H') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') as 'Day'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%H')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%H')";
 
@@ -178,19 +174,13 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 			}
 
 		} else if (s == "business") {
-			if (counter == 0) {
-				sql.select = "SELECT ";
-				// if this is the first
-			} else {
-				sql.select += ',';
-			}
-
-			sql.select += "KPI_BUSINESS_NM as 'Business'";
 
 			if (c == "top") {
 				// doing nothing
 				// we just have one level
+				sql.select += ", KPI_BUSINESS_NM as 'Business'";
 			} else {
+				sql.select += ", KPI_BUSINESS_NM as 'Business'";
 				// !!! notice here, we don't have a next level for business
 				vector<string> business = vector<string>();
 				d.getRepValues(business);
@@ -198,28 +188,128 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				string businessStr = "";
 				for (string y : business) {
 					str += "'" + y + "',";
-					businessStr += y + "/";
 				}
 				str = str.substr(0, str.length() - 1) + ")";
-				businessStr = "'"
-						+ businessStr.substr(0, businessStr.length() - 1) + "'";
 				sql.where += str;
 				counter++;
 			}
 		} else if (s == "money_category") {
+			if (c == "top") {
+				/*
+				 *if we just add money
+				 */
+				sql.select += ", KPI_CATEGORY_COARSE_X as 'Money_Category'";
+			} else if (c == "coarse") {
+				/*
+				 *if we select a money coarse category
+				 */
+				sql.select +=
+						", KPI_CATEGORY_COARSE_X as 'Money_Coarse', KPI_CATEGORY_MID_X as 'Money_Category'";
+				vector<string> moneyCoarse = vector<string>();
+				d.getRepValues(moneyCoarse);
+				string str = " and KPI_CATEGORY_COARSE_X in (";
+				for (string y : moneyCoarse) {
+					str += "'" + y + "',";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				sql.where += str;
+				counter++;
+			} else if (c == "mid") {
+				/**
+				 *  if we select a money mid category
+				 */
+				sql.select +=
+						", KPI_CATEGORY_COARSE_X as 'Money_Coarse', KPI_CATEGORY_MID_X as 'Money_Mid', KPI_CATEGORY_FINE_X as 'Money_Category'";
+				vector<string> moneyMid = vector<string>();
+				d.getRepValues(moneyMid);
+				string strCoarse = " and KPI_CATEGORY_COARSE_X in (";
+				string strMid = " and KPI_CATEGORY_MID_X in (";
+				std::vector<std::string> strs;
+
+				for (string y : moneyMid) {
+					boost::split(strs, y, boost::is_any_of("-"));
+					strCoarse += "'" + strs.at(0) + "',";
+					strMid += "'" + strs.at(1) + "',";
+				}
+				strCoarse = strCoarse.substr(0, strCoarse.length() - 1) + ")";
+				strMid = strMid.substr(0, strMid.length() - 1) + ")";
+				sql.where += strCoarse;
+				sql.where += strMid;
+				counter++;
+			} else if (c == "fine") {
+				/**
+				 * I don't think this is useful...
+				 */
+				sql.select +=
+						", KPI_CATEGORY_COARSE_X as 'Money_Coarse', KPI_CATEGORY_MID_X as 'Money_Mid', KPI_CATEGORY_FINE_X as 'Money_Fine'";
+				vector<string> moneyMid = vector<string>();
+				d.getRepValues(moneyMid);
+				string strCoarse = " and KPI_CATEGORY_COARSE_X in (";
+				string strMid = " and KPI_CATEGORY_MID_X in (";
+				string strFine = " and KPI_CATEGORY_Fine_X in (";
+				std::vector<std::string> strs;
+
+				for (string y : moneyMid) {
+					boost::split(strs, y, boost::is_any_of("-"));
+					strCoarse += "'" + strs.at(0) + "',";
+					strMid += "'" + strs.at(1) + "',";
+					strFine += "'" + strs.at(2) + "',";
+				}
+				strCoarse = strCoarse.substr(0, strCoarse.length() - 1) + ")";
+				strMid = strMid.substr(0, strMid.length() - 1) + ")";
+				strFine = strMid.substr(0, strMid.length() - 1) + ")";
+				sql.where += strCoarse;
+				sql.where += strMid;
+				sql.where += strFine;
+				counter++;
+			} else {
+				cout
+						<< " too much detail in money category. haven't implemented yet"
+						<< endl;
+			}
+
 		} else if (s == "account_type") {
+			// we only have one level here
+			if (c == "top") {
+				sql.select += ", REG_ABBREV_C as 'Account_Type'";
+				sql.from += ", BDC_ACCOUNT_MINI_DIM mini_dim";
+				sql.where +=
+						" AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
+				counter++;
+			} else {
+				sql.select += ", REG_ABBREV_C as 'Account_Type'";
+				sql.from += ", BDC_ACCOUNT_MINI_DIM mini_dim";
+				sql.where +=
+						" AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
+				// !!! notice here, we don't have a next level for account type
+				vector<string> account = vector<string>();
+				d.getRepValues(account);
+				string str = " and REG_ABBREV_C in (";
+				for (string y : account) {
+					str += "'" + y + "',";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				sql.where += str;
+				counter++;
+			}
+		} else if (s == "value") {
+			sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'"
+					+ sql.select;
+			sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI"
+					+ sql.from;
+			sql.where = "WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID" + sql.where;
+			// check operator
+			// should be just one
+			string op = d.getOperator();
+			transform(op.begin(), op.end(), op.begin(),
+					ptr_fun<int, int>(toupper));
+			if (op != "SUM") {
+				cout << "altering operator" << endl;
+				size_t f = sql.select.find("SUM(");
+				sql.select.replace(f, std::string("SUM(").length(), op + "(");
+			}
 		} else {
-
-		}
-
-		// check operator
-		// should be just one
-		string op = d.getOperator();
-		transform(op.begin(), op.end(), op.begin(), ptr_fun<int, int>(toupper));
-		if (op != "SUM") {
-			cout << "altering operator" << endl;
-			size_t f = sql.select.find("SUM(");
-			sql.select.replace(f, std::string("SUM(").length(), op + "(");
+			cout << "Invalid dimension called " << s << endl;
 		}
 	}
 }

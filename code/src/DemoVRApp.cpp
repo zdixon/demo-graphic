@@ -28,7 +28,10 @@ void DemoVRApp::test() {
 	vector<Dimension<float> > fds = vector<Dimension<float> >();
 	vector<Dimension<string> > sds = vector<Dimension<string> >();
 
-	// test if year works
+	// add a fake dimension
+	Dimension<string> value = Dimension<string>("Value");
+	value.addPath("top");
+	value.setOperator("SUM");
 
 	/**
 	 * 1.default: year x value
@@ -39,6 +42,7 @@ void DemoVRApp::test() {
 	topTime.setOperator("SUM");
 
 	sds.push_back(topTime);
+	sds.push_back(value); // add a fake dimension
 
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
@@ -55,6 +59,7 @@ void DemoVRApp::test() {
 	yearTime.setOperator("SUM");
 	sds.clear();
 	sds.push_back(yearTime);
+	sds.push_back(value); // add a fake dimension
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
 	_testCube.printData();
@@ -71,6 +76,7 @@ void DemoVRApp::test() {
 	monthTime.setOperator("SUM");
 	sds.clear();
 	sds.push_back(monthTime);
+	sds.push_back(value); // add a fake dimension
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
 	_testCube.printData();
@@ -88,6 +94,7 @@ void DemoVRApp::test() {
 	dayTime.setOperator("SUM");
 	sds.clear();
 	sds.push_back(dayTime);
+	sds.push_back(value); // add a fake dimension
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
 	_testCube.printData();
@@ -107,6 +114,7 @@ void DemoVRApp::test() {
 	sds.clear();
 	sds.push_back(time);
 	sds.push_back(business);
+	sds.push_back(value); // add a fake dimension
 
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
@@ -129,6 +137,114 @@ void DemoVRApp::test() {
 	sds.clear();
 	sds.push_back(timeSecond);
 	sds.push_back(businessSecond);
+	sds.push_back(value); // add a fake dimension
+
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+	/**
+	 * 7. add dimension money_category (, business, and time)
+	 */
+	cout << "========Test when looking year, business, and money========"
+			<< endl;
+	Dimension<string> moneyCag = Dimension<string>("Money_Category");
+	moneyCag.addPath("Top");
+	moneyCag.setOperator("SUM");
+
+	sds.clear();
+	sds.push_back(time);
+	sds.push_back(business);
+	sds.push_back(moneyCag);
+	sds.push_back(value); // add a fake dimension
+
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+	/**
+	 * 8. add dimension money_category (, business, and time) and look at a money_category
+	 */
+	cout
+			<< "========Test when looking year, business, and money (and look at a money_category)========"
+			<< endl;
+	Dimension<string> moneyCoarse = Dimension<string>("Money_Category",
+			"Retirement");
+	moneyCoarse.addPath("Top");
+	moneyCoarse.addPath("Coarse");
+	moneyCoarse.setOperator("SUM");
+
+	sds.clear();
+	sds.push_back(time);
+	sds.push_back(business);
+	sds.push_back(moneyCoarse);
+	sds.push_back(value); // add a fake dimension
+
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+	/**
+	 * 9. add dimension money_category (, business, and time) and look at a money_category
+	 */
+	cout
+			<< "========Test when looking year, business, and money (and look at a mid money_category)========"
+			<< endl;
+	Dimension<string> moneyMid = Dimension<string>("Money_Category",
+			"Retirement-Retire_TOA");
+	moneyMid.addPath("Top");
+	moneyMid.addPath("Mid");
+	moneyMid.setOperator("MAX");
+
+	sds.clear();
+	sds.push_back(time);
+	sds.push_back(business);
+	sds.push_back(moneyMid);
+	sds.push_back(value); // add a fake dimension
+
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+	/**
+	 * 10. add dimension account_type (money_category, business, and time)
+	 */
+	cout
+			<< "========Test when looking account, year, business, and money========"
+			<< endl;
+	Dimension<string> accout = Dimension<string>("Account_Type");
+	accout.addPath("Top");
+	accout.setOperator("MAX");
+
+	sds.clear();
+	sds.push_back(time);
+	sds.push_back(business);
+	sds.push_back(moneyCag);
+	sds.push_back(accout);
+	sds.push_back(value); // add a fake dimension
+
+	_testCube.setInterfaceDimensions(ids, fds, sds);
+	_testCube.queryDatabase();
+	_testCube.printData();
+
+	/**
+	 * 10. add dimension account_type (money_category, business, and time)
+	 */
+	cout
+			<< "========Test when looking account, year, business, and money (a specific account type)========"
+			<< endl;
+	Dimension<string> accoutNext = Dimension<string>("Account_Type",
+			"SMALL BUSINESS");
+	accoutNext.addPath("Top");
+	accoutNext.addPath("Account_Next");
+	accoutNext.setOperator("MAX");
+
+	sds.clear();
+	sds.push_back(time);
+	sds.push_back(business);
+	sds.push_back(moneyCag);
+	sds.push_back(accoutNext);
+	sds.push_back(value); // add a fake dimension
 
 	_testCube.setInterfaceDimensions(ids, fds, sds);
 	_testCube.queryDatabase();
