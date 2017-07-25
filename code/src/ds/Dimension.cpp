@@ -17,7 +17,7 @@
  */
 template<typename T>
 Dimension<T>::Dimension() :
-				_name(0),
+				_name(""),
 				_valueSet(set<T>()),
 				_valueVector(vector<T>()),
 				_path(vector<string>()),
@@ -77,7 +77,7 @@ T Dimension<T>::getValueAt(int i) {
  *
  */
 template<typename T>
-void Dimension<T>::getValues(vector<T> & vs) {
+void Dimension<T>::getRepValues(vector<T> & vs) {
 	vs = _valueVector;
 }
 /**
@@ -132,7 +132,7 @@ int Dimension<T>::getSize() {
  *
  */
 template<typename T>
-void Dimension<T>::addValue(T v) {
+void Dimension<T>::addNonRepValue(T v) {
 	if (_valueSet.find(v) == _valueSet.end()) {
 		// check if we have this value
 		_valueSet.insert(v);
@@ -141,6 +141,19 @@ void Dimension<T>::addValue(T v) {
 		_valueVector.push_back(v);
 		sort();
 	}
+}
+
+/**
+ *
+ */
+template<typename T>
+void Dimension<T>::addRepValue(T v) {
+	if (_valueSet.find(v) == _valueSet.end()) {
+		// check if we have this value
+		_valueSet.insert(v);
+	}
+	_valueVector.push_back(v);
+	sort();
 }
 /**
  *

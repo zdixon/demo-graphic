@@ -33,6 +33,13 @@ struct InterfaceData {
 			sd.print();
 		}
 	}
+
+	void clear() {
+		cout << "clear " << endl;
+		intDimension.clear();
+		floatDimension.clear();
+		stringDimension.clear();
+	}
 };
 
 #endif /* SRC_DS_INTERFACEDATA_H_ */

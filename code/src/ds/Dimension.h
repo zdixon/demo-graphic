@@ -39,7 +39,7 @@ public:
 	T getValueAt(int i);
 
 	// get all the values
-	void getValues(vector<T> & vs);
+	void getRepValues(vector<T> & vs);
 
 	// get the path of levels
 	void getPath(vector<string> & p);
@@ -69,7 +69,10 @@ public:
 	T getLastValue();
 
 	// add a value
-	void addValue(T v);
+	void addNonRepValue(T v);
+
+	// add a value
+	void addRepValue(T v);
 
 	// add a level to the path
 	void addPath(string p);

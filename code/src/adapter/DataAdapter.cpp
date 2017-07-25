@@ -69,13 +69,10 @@ void DataAdapter::getResult(InterfaceData & interDims,
  * This function is customized
  */
 void DataAdapter::setSQLTemplate(SQL & sql) {
-//	sql.select = "SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year', DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' ";
-	sql.select =
-			"SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'";
-//	sql.from = "FROM BDC_TXN_FACT_MA_MORE as base, BDC_KPI_DIM_MORE as kpi";
+	sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'";
 	sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI";
 	sql.where = "WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID";
-	sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y')";
+	sql.groupBy = "GROUP BY 'Time'";
 	sql.orderBy = "ORDER BY 'Time'";
 }
 /**
@@ -99,19 +96,120 @@ void DataAdapter::parseIntDimensions(SQL & sql, vector<Dimension<int> > & ids) {
 void DataAdapter::parseStringDimensions(SQL & sql,
 		vector<Dimension<string> > & sds) {
 	std::locale loc;
+	int counter = 0;
 	for (Dimension<string> d : sds) {
 		string s = d.getName();
-		transform(s.begin(), s.end(), s.begin(), ptr_fun<int, int>(toupper));
+		string c = d.getCurrentLevel();
+
+		transform(s.begin(), s.end(), s.begin(), ptr_fun<int, int>(tolower));
+		transform(c.begin(), c.end(), c.begin(), ptr_fun<int, int>(tolower));
+
 		if (s == "time") {
-		}
+			if (c == "top") {
+				/**
+				 * This is the default one: year against sum of values
+				 */
+				sql.select =
+						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time'";
+				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y')";
+				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%Y')";
+				counter++;
+			} else if (c == "year") {
+				/**
+				 * This is when navigates to specific years
+				 */
+				vector<string> years = vector<string>();
+				d.getRepValues(years);
+				string str = " and DATE_FORMAT(SNAPSHOT_D, '%Y') in (";
+				for (string y : years) {
+					str += "'" + y + "',";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				sql.where += str;
+				sql.select =
+						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%m') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y') as 'Year'";
+				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%m')";
+				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m')";
+				counter++;
+			} else if (c == "month") {
+				/**
+				 * This is when navigates to specific years AND specific months in the format of 2012-05
+				 */
+				vector<string> months = vector<string>();
+				d.getRepValues(months);
+				string str = " and DATE_FORMAT(SNAPSHOT_D, '%Y-%m') in (";
+				for (string m : months) {
+					str += "'" + m + "',";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				sql.where += str;
 
-		if (s == "business") {
-		}
+				sql.select =
+						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%d') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m') as 'Month'";
+				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%d')";
+				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%d')";
 
-		if (s == "money_category") {
-		}
+				counter++;
+			} else if (c == "day") {
+				/**
+				 * This is when navigates to specific years AND specific months AND days in the format of 2012-05-01
+				 */
+				vector<string> days = vector<string>();
+				d.getRepValues(days);
+				string str = " and DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') in (";
+				string dayStr = "";
+				for (string m : days) {
+					str += "'" + m + "',";
+					dayStr += m + "/";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				dayStr = "'" + dayStr.substr(0, dayStr.length() - 1) + "'";
+				sql.where += str;
 
-		if (s == "account_type") {
+				sql.select =
+						"SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value', DATE_FORMAT(SNAPSHOT_D, '%H') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') as 'Day'";
+				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%H')";
+				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%H')";
+
+				counter++;
+			} else {
+				cout << " too much detail in time. haven't implemented yet"
+						<< endl;
+			}
+
+		} else if (s == "business") {
+			if (counter == 0) {
+				sql.select = "SELECT ";
+				// if this is the first
+			} else {
+				sql.select += ',';
+			}
+
+			sql.select += "KPI_BUSINESS_NM as 'Business'";
+
+			if (c == "top") {
+				// doing nothing
+				// we just have one level
+			} else {
+				// !!! notice here, we don't have a next level for business
+				vector<string> business = vector<string>();
+				d.getRepValues(business);
+				string str = " and KPI_BUSINESS_NM in (";
+				string businessStr = "";
+				for (string y : business) {
+					str += "'" + y + "',";
+					businessStr += y + "/";
+				}
+				str = str.substr(0, str.length() - 1) + ")";
+				businessStr = "'"
+						+ businessStr.substr(0, businessStr.length() - 1) + "'";
+				sql.where += str;
+				counter++;
+			}
+		} else if (s == "money_category") {
+		} else if (s == "account_type") {
+		} else {
+
 		}
 
 		// check operator
@@ -139,6 +237,10 @@ string DataAdapter::parseSQL(SQL sql) {
  */
 void DataAdapter::parseResultSet(sql::ResultSet * rs,
 		InterfaceData & cubeDims) {
+
+// !!!!!!! to clear up whatever there
+	cubeDims.clear();
+
 	sql::ResultSetMetaData * rsmd = rs->getMetaData();
 	int numcols = rsmd->getColumnCount();
 
@@ -155,14 +257,14 @@ void DataAdapter::parseResultSet(sql::ResultSet * rs,
 		if (name == "Value") {
 			Dimension<float> df = Dimension<float>(name);
 			while (rs->next()) {
-				df.addValue(float(rs->getDouble(name)));
+				df.addRepValue(float(rs->getDouble(name)));
 			}
 			cubeDims.floatDimension.push_back(df);
 //			df.print();
 		} else {
 			Dimension<string> sf = Dimension<string>(name);
 			while (rs->next()) {
-				sf.addValue(rs->getString(name));
+				sf.addRepValue(rs->getString(name));
 			}
 			cubeDims.stringDimension.push_back(sf);
 //			sf.print();
