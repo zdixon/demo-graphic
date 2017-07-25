@@ -38,8 +38,7 @@ void DBHandler::closeConnection() {
 		//   - sql::SQLException (derived from std::runtime_error)
 
 		std::cout << "# ERR: SQLException in " << __FILE__;
-		std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__
-				<< std::endl;
+		std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
 		/* what() (derived from std::runtime_error) fetches error message */
 		std::cout << "# ERR: " << e.what();
 		std::cout << " (MySQL error code: " << e.getErrorCode();
@@ -76,8 +75,7 @@ int DBHandler::getConnection() {
 		//   - sql::SQLException (derived from std::runtime_error)
 
 		std::cout << "# ERR: SQLException in " << __FILE__;
-		std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__
-				<< std::endl;
+		std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
 		/* what() (derived from std::runtime_error) fetches error message */
 		std::cout << "# ERR: " << e.what();
 		std::cout << " (MySQL error code: " << e.getErrorCode();
@@ -105,8 +103,7 @@ sql::ResultSet* DBHandler::exeQuery(std::string sql) {
 			return res;
 		} catch (sql::SQLException &e) {
 			std::cout << "# ERR: SQLException in " << __FILE__;
-			std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__
-					<< std::endl;
+			std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
 			/* what() (derived from std::runtime_error) fetches error message */
 			std::cout << "# ERR: " << e.what();
 			std::cout << " (MySQL error code: " << e.getErrorCode();

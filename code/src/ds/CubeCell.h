@@ -19,8 +19,7 @@ using namespace std;
 class CubeCell {
 public:
 	CubeCell();
-	CubeCell(Dimension<string> x, Dimension<string> y, Dimension<string> z,
-			Dimension<float> v);
+	CubeCell(Dimension<string> x, Dimension<string> y, Dimension<string> z, Dimension<float> v);
 	CubeCell(Dimension<string> x, Dimension<string> y, Dimension<float> v);
 	CubeCell(Dimension<string> x, Dimension<float> v);
 	CubeCell(Dimension<float> v);

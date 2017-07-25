@@ -17,11 +17,7 @@
  */
 template<typename T>
 Dimension<T>::Dimension() :
-				_name(""),
-				_valueSet(set<T>()),
-				_valueVector(vector<T>()),
-				_path(vector<string>()),
-				_operator("sum") {
+		_name(""), _valueSet(set<T>()), _valueVector(vector<T>()), _path(vector<string>()), _operator("sum") {
 
 }
 /**
@@ -29,11 +25,7 @@ Dimension<T>::Dimension() :
  */
 template<typename T>
 Dimension<T>::Dimension(string name) :
-				_name(name),
-				_valueSet(set<T>()),
-				_valueVector(vector<T>()),
-				_path(vector<string>()),
-				_operator("sum") {
+		_name(name), _valueSet(set<T>()), _valueVector(vector<T>()), _path(vector<string>()), _operator("sum") {
 
 }
 /**
@@ -41,11 +33,7 @@ Dimension<T>::Dimension(string name) :
  */
 template<typename T>
 Dimension<T>::Dimension(string name, T value) :
-				_name(name),
-				_valueSet(set<T>()),
-				_valueVector(vector<T>()),
-				_path(vector<string>()),
-				_operator("sum") {
+		_name(name), _valueSet(set<T>()), _valueVector(vector<T>()), _path(vector<string>()), _operator("sum") {
 	_valueSet.insert(value);
 	_valueVector.push_back(value);
 }

@@ -51,8 +51,7 @@ void DataAdapter::close() {
 /**
  *
  */
-void DataAdapter::getResult(InterfaceData & interDims,
-		InterfaceData & cubeDims) {
+void DataAdapter::getResult(InterfaceData & interDims, InterfaceData & cubeDims) {
 	SQL sql = SQL();
 	setSQLTemplate(sql);
 
@@ -75,8 +74,7 @@ void DataAdapter::setSQLTemplate(SQL & sql) {
 /**
  *
  */
-void DataAdapter::parseFloatDimensions(SQL & sql,
-		vector<Dimension<float> > & fds) {
+void DataAdapter::parseFloatDimensions(SQL & sql, vector<Dimension<float> > & fds) {
 	cout << "nothing here, we don't have float dimensions" << endl;
 }
 
@@ -90,8 +88,7 @@ void DataAdapter::parseIntDimensions(SQL & sql, vector<Dimension<int> > & ids) {
 /**
  *
  */
-void DataAdapter::parseStringDimensions(SQL & sql,
-		vector<Dimension<string> > & sds) {
+void DataAdapter::parseStringDimensions(SQL & sql, vector<Dimension<string> > & sds) {
 	std::locale loc;
 	int counter = 0;
 	for (Dimension<string> d : sds) {
@@ -122,8 +119,7 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				}
 				str = str.substr(0, str.length() - 1) + ")";
 				sql.where += str;
-				sql.select +=
-						", DATE_FORMAT(SNAPSHOT_D, '%m') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y') as 'Year'";
+				sql.select += ", DATE_FORMAT(SNAPSHOT_D, '%m') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y') as 'Year'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%m')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m')";
 				counter++;
@@ -140,8 +136,7 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				str = str.substr(0, str.length() - 1) + ")";
 				sql.where += str;
 
-				sql.select +=
-						", DATE_FORMAT(SNAPSHOT_D, '%d') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m') as 'Month'";
+				sql.select += ", DATE_FORMAT(SNAPSHOT_D, '%d') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m') as 'Month'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%d')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%d')";
 
@@ -162,15 +157,13 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				dayStr = "'" + dayStr.substr(0, dayStr.length() - 1) + "'";
 				sql.where += str;
 
-				sql.select +=
-						", DATE_FORMAT(SNAPSHOT_D, '%H') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') as 'Day'";
+				sql.select += ", DATE_FORMAT(SNAPSHOT_D, '%H') as 'Time', DATE_FORMAT(SNAPSHOT_D, '%Y-%m-%d') as 'Day'";
 				sql.groupBy = "GROUP BY DATE_FORMAT (SNAPSHOT_D, '%H')";
 				sql.orderBy = "ORDER BY DATE_FORMAT (SNAPSHOT_D, '%H')";
 
 				counter++;
 			} else {
-				cout << " too much detail in time. haven't implemented yet"
-						<< endl;
+				cout << " too much detail in time. haven't implemented yet" << endl;
 			}
 
 		} else if (s == "business") {
@@ -202,8 +195,7 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				/*
 				 *if we select a money coarse category
 				 */
-				sql.select +=
-						", KPI_CATEGORY_COARSE_X as 'Money_Coarse', KPI_CATEGORY_MID_X as 'Money_Category'";
+				sql.select += ", KPI_CATEGORY_COARSE_X as 'Money_Coarse', KPI_CATEGORY_MID_X as 'Money_Category'";
 				vector<string> moneyCoarse = vector<string>();
 				d.getRepValues(moneyCoarse);
 				string str = " and KPI_CATEGORY_COARSE_X in (";
@@ -262,9 +254,7 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 				sql.where += strFine;
 				counter++;
 			} else {
-				cout
-						<< " too much detail in money category. haven't implemented yet"
-						<< endl;
+				cout << " too much detail in money category. haven't implemented yet" << endl;
 			}
 
 		} else if (s == "account_type") {
@@ -272,14 +262,12 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 			if (c == "top") {
 				sql.select += ", REG_ABBREV_C as 'Account_Type'";
 				sql.from += ", BDC_ACCOUNT_MINI_DIM mini_dim";
-				sql.where +=
-						" AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
+				sql.where += " AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
 				counter++;
 			} else {
 				sql.select += ", REG_ABBREV_C as 'Account_Type'";
 				sql.from += ", BDC_ACCOUNT_MINI_DIM mini_dim";
-				sql.where +=
-						" AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
+				sql.where += " AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID";
 				// !!! notice here, we don't have a next level for account type
 				vector<string> account = vector<string>();
 				d.getRepValues(account);
@@ -295,16 +283,13 @@ void DataAdapter::parseStringDimensions(SQL & sql,
 			/**
 			 *add a fake dimension to init select and set operator
 			 */
-			sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'"
-					+ sql.select;
-			sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI"
-					+ sql.from;
+			sql.select = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value'" + sql.select;
+			sql.from = "FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI" + sql.from;
 			sql.where = "WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID" + sql.where;
 			// check operator
 			// should be just one
 			string op = d.getOperator();
-			transform(op.begin(), op.end(), op.begin(),
-					ptr_fun<int, int>(toupper));
+			transform(op.begin(), op.end(), op.begin(), ptr_fun<int, int>(toupper));
 			if (op != "SUM") {
 				cout << "altering operator" << endl;
 				size_t f = sql.select.find("SUM(");
@@ -320,15 +305,13 @@ void DataAdapter::parseStringDimensions(SQL & sql,
  *
  */
 string DataAdapter::parseSQL(SQL sql) {
-	return sql.select + " " + sql.from + " " + sql.where + " " + sql.groupBy
-			+ " " + sql.orderBy + ";";
+	return sql.select + " " + sql.from + " " + sql.where + " " + sql.groupBy + " " + sql.orderBy + ";";
 }
 
 /**
  *
  */
-void DataAdapter::parseResultSet(sql::ResultSet * rs,
-		InterfaceData & cubeDims) {
+void DataAdapter::parseResultSet(sql::ResultSet * rs, InterfaceData & cubeDims) {
 
 // !!!!!!! to clear up whatever there
 	cubeDims.clear();

@@ -32,7 +32,7 @@ public:
 	void closeConnection();
 
 private:
-    sql::Connection *m_con;
-    sql::Statement *m_stmt;
+	sql::Connection *m_con;
+	sql::Statement *m_stmt;
 };
 #endif /* DBHANDLER_H_ */

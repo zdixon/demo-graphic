@@ -122,8 +122,7 @@ void DemoVRApp::test() {
 	 * 6. add dimension business (and time) and check new_money
 	 */
 	cout << "========Test when looking year and business========" << endl;
-	Dimension<string> businessSecond = Dimension<string>("Business",
-			"New_money");
+	Dimension<string> businessSecond = Dimension<string>("Business", "New_money");
 	businessSecond.addPath("Top");
 	businessSecond.addPath("Business_Type");
 
@@ -143,8 +142,7 @@ void DemoVRApp::test() {
 	/**
 	 * 7. add dimension money_category (, business, and time)
 	 */
-	cout << "========Test when looking year, business, and money========"
-			<< endl;
+	cout << "========Test when looking year, business, and money========" << endl;
 	Dimension<string> moneyCag = Dimension<string>("Money_Category");
 	moneyCag.addPath("Top");
 
@@ -161,11 +159,8 @@ void DemoVRApp::test() {
 	/**
 	 * 8. add dimension money_category (, business, and time) and look at a money_category
 	 */
-	cout
-			<< "========Test when looking year, business, and money (and look at a money_category)========"
-			<< endl;
-	Dimension<string> moneyCoarse = Dimension<string>("Money_Category",
-			"Retirement");
+	cout << "========Test when looking year, business, and money (and look at a money_category)========" << endl;
+	Dimension<string> moneyCoarse = Dimension<string>("Money_Category", "Retirement");
 	moneyCoarse.addPath("Top");
 	moneyCoarse.addPath("Coarse");
 
@@ -182,12 +177,9 @@ void DemoVRApp::test() {
 	/**
 	 * 9. add dimension money_category (, business, and time) and look at a money_category
 	 */
-	cout
-			<< "========Test when looking year, business, and money (and look at a mid money_category)========"
-			<< endl;
+	cout << "========Test when looking year, business, and money (and look at a mid money_category)========" << endl;
 	// using dash as a seperator
-	Dimension<string> moneyMid = Dimension<string>("Money_Category",
-			"Retirement-Retire_TOA");
+	Dimension<string> moneyMid = Dimension<string>("Money_Category", "Retirement-Retire_TOA");
 	moneyMid.addPath("Top");
 	moneyMid.addPath("Mid");
 
@@ -204,9 +196,7 @@ void DemoVRApp::test() {
 	/**
 	 * 10. add dimension account_type (money_category, business, and time)
 	 */
-	cout
-			<< "========Test when looking account, year, business, and money========"
-			<< endl;
+	cout << "========Test when looking account, year, business, and money========" << endl;
 	Dimension<string> accout = Dimension<string>("Account_Type");
 	accout.addPath("Top");
 
@@ -224,11 +214,8 @@ void DemoVRApp::test() {
 	/**
 	 * 10. add dimension account_type (money_category, business, and time)
 	 */
-	cout
-			<< "========Test when looking account, year, business, and money (a specific account type)========"
-			<< endl;
-	Dimension<string> accoutNext = Dimension<string>("Account_Type",
-			"SMALL BUSINESS");
+	cout << "========Test when looking account, year, business, and money (a specific account type)========" << endl;
+	Dimension<string> accoutNext = Dimension<string>("Account_Type", "SMALL BUSINESS");
 	accoutNext.addPath("Top");
 	accoutNext.addPath("Account_Next");
 
@@ -296,11 +283,9 @@ void DemoVRApp::_checkContext() {
 // in a non-graphical sense.
 void DemoVRApp::_showCameraPosition() {
 
-	std::cout << "Camera is at (" << _scene.getCameraPosition().x << ", "
-			<< _scene.getCameraPosition().y << ", "
+	std::cout << "Camera is at (" << _scene.getCameraPosition().x << ", " << _scene.getCameraPosition().y << ", "
 			<< _scene.getCameraPosition().z << ")... ";
-	std::cout << "looking at (" << _scene.getLookAtPosition().x << ", "
-			<< _scene.getLookAtPosition().y << ", "
+	std::cout << "looking at (" << _scene.getLookAtPosition().x << ", " << _scene.getLookAtPosition().y << ", "
 			<< _scene.getLookAtPosition().z << ")." << std::endl;
 }
 
@@ -308,8 +293,7 @@ void DemoVRApp::_initializeScene() {
 
 // Create a list of lights.  If the shader you're using doesn't use
 // lighting, and the shapes don't have textures, this is irrelevant.
-	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f),
-			glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
 
 // Create a shader manager and load the light list.
 	_shader->addLights(_lights);
@@ -350,10 +334,8 @@ void DemoVRApp::_initializeScene() {
 	_modelGroup->setPosition(glm::vec3(0.0f, 0.0f, -10.0f));
 	_scene.addObject(_modelGroup);
 
-	_axesShader->addShader(bsg::GLSHADER_VERTEX,
-			"../code/shaders/shaderSimple.vp");
-	_axesShader->addShader(bsg::GLSHADER_FRAGMENT,
-			"../code/shaders/shaderSimple.fp");
+	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../code/shaders/shaderSimple.vp");
+	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../code/shaders/shaderSimple.fp");
 	_axesShader->compileShaders();
 
 	_axesSet = new bsg::drawableAxes(_axesShader, 100.0f);
@@ -398,8 +380,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 /// apparatus.  Some render calls are shared among multiple views,
 /// for example a stereo view has two renders, with the same render
 /// context.
-void DemoVRApp::onVRRenderGraphicsContext(
-		const MinVR::VRGraphicsState &renderState) {
+void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderState) {
 
 // Check if this is the first call.  If so, do some initialization.
 	if (renderState.isInitialRenderCall()) {
@@ -421,16 +402,11 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 
 		// If you want to adjust the positions of the various objects in
 		// your scene, you can do that here.
-		_orbiter->setPosition(3.0f * cos(_oscillator), 3.0,
-				3.0 * sin(_oscillator));
-		_orbiter->setOrientation(
-				glm::quat(0.5 * cos(_oscillator * 1.1f), 0.0, cos(_oscillator),
-						sin(_oscillator)));
-		_modelGroup->setPosition(cos(_oscillator / 1.2f),
-				-2.2f + sin(_oscillator / 1.2f), -10.0);
+		_orbiter->setPosition(3.0f * cos(_oscillator), 3.0, 3.0 * sin(_oscillator));
+		_orbiter->setOrientation(glm::quat(0.5 * cos(_oscillator * 1.1f), 0.0, cos(_oscillator), sin(_oscillator)));
+		_modelGroup->setPosition(cos(_oscillator / 1.2f), -2.2f + sin(_oscillator / 1.2f), -10.0);
 		_modelGroup->setOrientation(
-				glm::quat(0.5 * cos(_oscillator * 0.1f), 0.0,
-						cos(_oscillator * 0.2f), sin(_oscillator * 0.2f)));
+				glm::quat(0.5 * cos(_oscillator * 0.1f), 0.0, cos(_oscillator * 0.2f), sin(_oscillator * 0.2f)));
 
 		// Now the preliminaries are done, on to the actual drawing.
 
@@ -441,16 +417,14 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 		// Second the load() step.  We let MinVR give us the projection
 		// matrix from the render state argument to this method.
 		const float* pm = renderState.getProjectionMatrix();
-		glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4],
-				pm[5], pm[6], pm[7], pm[8], pm[9], pm[10], pm[11], pm[12],
-				pm[13], pm[14], pm[15]);
+		glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6], pm[7], pm[8], pm[9], pm[10],
+				pm[11], pm[12], pm[13], pm[14], pm[15]);
 		_scene.load();
 
 		// The draw step.  We let MinVR give us the view matrix.
 		const float* vm = renderState.getViewMatrix();
-		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4],
-				vm[5], vm[6], vm[7], vm[8], vm[9], vm[10], vm[11], vm[12],
-				vm[13], vm[14], vm[15]);
+		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4], vm[5], vm[6], vm[7], vm[8], vm[9], vm[10],
+				vm[11], vm[12], vm[13], vm[14], vm[15]);
 
 		//bsg::bsgUtils::printMat("view", viewMatrix);
 		_scene.draw(viewMatrix, projMatrix);

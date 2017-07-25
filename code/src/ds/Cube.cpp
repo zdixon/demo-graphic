@@ -35,8 +35,8 @@ void Cube::setInterfaceDimensions(InterfaceData & interfaceDims) {
 /**
  *
  */
-void Cube::setInterfaceDimensions(vector<Dimension<int> > ids,
-		vector<Dimension<float> > fds, vector<Dimension<string> > sds) {
+void Cube::setInterfaceDimensions(vector<Dimension<int> > ids, vector<Dimension<float> > fds,
+		vector<Dimension<string> > sds) {
 	_interfaceDims.floatDimension = fds;
 	_interfaceDims.intDimension = ids;
 	_interfaceDims.stringDimension = sds;

@@ -18,16 +18,14 @@ CubeCell::CubeCell() {
 /*
  *
  */
-CubeCell::CubeCell(Dimension<string> x, Dimension<string> y,
-		Dimension<string> z, Dimension<float> v) {
+CubeCell::CubeCell(Dimension<string> x, Dimension<string> y, Dimension<string> z, Dimension<float> v) {
 	_x = x, _y = y, _z = z, _v = v;
 }
 
 /*
  *
  */
-CubeCell::CubeCell(Dimension<string> x, Dimension<string> y,
-		Dimension<float> v) {
+CubeCell::CubeCell(Dimension<string> x, Dimension<string> y, Dimension<float> v) {
 	_x = x, _y = y, _v = v, _z = Dimension<string>(EMPTY);
 }
 
@@ -42,8 +40,7 @@ CubeCell::CubeCell(Dimension<string> x, Dimension<float> v) {
  *
  */
 CubeCell::CubeCell(Dimension<float> v) {
-	_x = Dimension<string>(EMPTY), _y = Dimension<string>(EMPTY), _z =
-			Dimension<string>(EMPTY), _v = v;
+	_x = Dimension<string>(EMPTY), _y = Dimension<string>(EMPTY), _z = Dimension<string>(EMPTY), _v = v;
 }
 
 /*
@@ -118,8 +115,7 @@ float CubeCell::getValue() {
 void CubeCell::print() {
 	cout << "(x,y,z,v)=";
 
-	cout << getXLabel() << "," << getYLabel() << "," << getZLabel() << ","
-			<< getValue() << endl;
+	cout << getXLabel() << "," << getYLabel() << "," << getZLabel() << "," << getValue() << endl;
 
 }
 
