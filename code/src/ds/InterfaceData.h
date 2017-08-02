@@ -11,16 +11,19 @@
 #include "../ds/Dimension.h"
 
 struct InterfaceData {
+	// in fact, we store everything in stringDimension
+	// the float dimension will be used only for the value/money
 	vector<Dimension<int> > intDimension;
 	vector<Dimension<float> > floatDimension;
 	vector<Dimension<string> > stringDimension;
+
 	InterfaceData() {
 		intDimension = vector<Dimension<int> >();
 		floatDimension = vector<Dimension<float> >();
 		stringDimension = vector<Dimension<string> >();
 	}
 	void print() {
-		cout << "all int dimensions: " << endl;
+		cout << "\nall int dimensions: " << endl;
 		for (Dimension<int> id : intDimension) {
 			id.print();
 		}

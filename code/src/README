@@ -1,8 +1,21 @@
-Fumeng's add-ups
+===Fumeng's document===
 
-1. I tried to compile the project using a higher version of CMake.
-2. When compiling locally, I try to compile it to an Eclispe project.
-If you don't have eclipse CDT install, the compiling may fail
-3. When adding code, I recommend (1) adding a CMakeLists.txt to that directory
+1. I tried to compile the project using a higher version of CMake. Make sure you have installed it. (Version 3.1.0)
+
+2. I'm lazy, so I write a script (build/auto-build.sh) to compile the whole thing.
+The script takes 1 argument.
+When this argument is "fm", it compiles the project into an Eclispe project using my personal configuration.
+Otherwise, this argument should be the path to your MinVR install directory.
+The rest of the script is trying to detect which OS you are doing and try to copy the dynamic library for mysql.
+
+3. When adding code, I recommend 
+(1) adding a CMakeLists.txt to that directory
 (2) add the directory to the most outer cmakelists
 (3) add the library to the cmakelists.txt with the exe entry
+
+4. In order to compile and run the code, here is the checklist
+(1) MinVR + OpenGL + C + Cmake -- I'm not going to say anything about this. 
+(2) link to the static librabries for mysql. They are in src/external/mysql. You should change the most outside CMakeList.txt to set MYSQL_LIBRARY, MYSQL_INCLUDE_CPPCONN_DIR, and MYSQL_INCLUDE_DIR.
+(3) after (2), you should be able to get the project compile. But make sure that you copy the right dynamic libraries into where you run the demo. This should be done when you first compile the project using the build/auto-build.sh.
+(4) Then try to compile the project again and run it. I didn't check the graphics part, so it doesn't work. But you should be able to see a series of printouts of the resutls from the database.
+

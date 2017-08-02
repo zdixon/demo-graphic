@@ -8,7 +8,7 @@ if [ "$1" == "fm" ]; then
     # cmake .. -DMINVR_INSTALL_DIR=/Users/fm/Documents/Github/MinVR/build/install/
     cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../code/ -DMINVR_INSTALL_DIR=/Users/fm/Documents/Github/MinVR/build/install/
 else
-    cmake ../code/  -DMINVR_INSTALL_DIR=/path/to/MinVR/build/install/
+    cmake ../code/  -DMINVR_INSTALL_DIR=$1
 fi
 
 make
