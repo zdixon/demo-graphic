@@ -8,6 +8,9 @@ include_directories(
   ${FREETYPE_INCLUDE_DIRS}
   )
 
+SET(CMAKE_EXE_LINKER_FLAGS "-v")
+
+
 set(bsg_headers bsg.h bsgMenagerie.h bsgObjModel.h)
 set(bsg_sources bsg.cpp bsgMenagerie.cpp bsgObjModel.cpp)
 set(bsg_files ${bsg_headers} ${bsg_sources})

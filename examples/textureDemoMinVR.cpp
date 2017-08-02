@@ -4,6 +4,138 @@
 #include <api/MinVR.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_GLYPH_H
+
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h" /* http://nothings.org/stb/stb_image_write.h */
+
+#define STB_TRUETYPE_IMPLEMENTATION 
+#include "stb_truetype.h" /* http://nothings.org/stb/stb_truetype.h */
+
+
+#define WIDTH   640
+#define HEIGHT  480
+
+
+/* origin is the upper left corner */
+unsigned char image[HEIGHT][WIDTH];
+
+void draw_bitmap(FT_Bitmap*  bitmap,
+	FT_Int      x,
+	FT_Int      y)
+{
+	FT_Int  i, j, p, q;
+	FT_Int  x_max = x + bitmap->width;
+	FT_Int  y_max = y + bitmap->rows;
+
+
+	for (i = x, p = 0; i < x_max; i++, p++)
+	{
+		for (j = y, q = 0; j < y_max; j++, q++)
+		{
+			if (i < 0 || j < 0 ||
+				i >= WIDTH || j >= HEIGHT)
+				continue;
+
+			image[HEIGHT - j][i] |= bitmap->buffer[q * bitmap->width + p];
+		}
+	}
+}
+
+
+void show_image(void)
+{
+	int  i, j;
+
+
+	for (i = 0; i < HEIGHT; i++)
+	{
+		for (j = 0; j < WIDTH; j++)
+			putchar(image[i][j] == 0 ? ' '
+				: image[i][j] < 128 ? '+'
+				: '*');
+		putchar('\n');
+	}
+}
+
+
+
+/* EOF */
+
+void drawString(char* word, int texture_width, int texture_height, int line_height)
+{
+	
+	///* load font file */
+
+	//FILE* fontFile = fopen("../fonts/arial.ttf", "rb");
+	//fseek(fontFile, 0, SEEK_END);
+	//const long size = ftell(fontFile); /* how long is the file ? */
+	//fseek(fontFile, 0, SEEK_SET); /* reset */
+
+	//unsigned char* fontBuffer = new unsigned char[size];
+
+	//fread(fontBuffer, size, 1, fontFile);
+	//fclose(fontFile);
+
+	///* prepare font */
+	//stbtt_fontinfo info;
+	//if (!stbtt_InitFont(&info, fontBuffer, 0))
+	//{
+	//	printf("failed\n");
+	//}
+
+	//int b_w = texture_width; /* bitmap width */
+	//int b_h = texture_height; /* bitmap height */
+	//int l_h = line_height; /* line height */
+
+	//			  /* create a bitmap for the phrase */
+	//unsigned char* bitmap =  new unsigned char[b_w * b_h];
+
+	///* calculate font scaling */
+	//float scale = stbtt_ScaleForPixelHeight(&info, l_h);
+
+	//int x = 0;
+
+	//int ascent, descent, lineGap;
+	//stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
+
+	//ascent *= scale;
+	//descent *= scale;
+
+	//int i;
+	//for (i = 0; i < strlen(word); ++i)
+	//{
+	//	/* get bounding box for character (may be offset to account for chars that dip above or below the line */
+	//	int c_x1, c_y1, c_x2, c_y2;
+	//	stbtt_GetCodepointBitmapBox(&info, word[i], scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
+
+	//	/* compute y (different characters have different heights */
+	//	int y = ascent + c_y1;
+
+	//	/* render character (stride and offset is important here) */
+	//	int byteOffset = x + (y  * b_w);
+	//	stbtt_MakeCodepointBitmap(&info, bitmap + byteOffset, c_x2 - c_x1, c_y2 - c_y1, b_w, scale, scale, word[i]);
+
+	//	/* how wide is this character */
+	//	int ax;
+	//	stbtt_GetCodepointHMetrics(&info, word[i], &ax, 0);
+	//	x += ax * scale;
+
+	//	/* add kerning */
+	//	int kern;
+	//	kern = stbtt_GetCodepointKernAdvance(&info, word[i], word[i + 1]);
+	//	x += kern * scale;
+	//}
+
+	///* save out a 1 channel image */
+	//stbi_write_png("out.png", b_w, b_h, 1, bitmap, b_w);
+
+	//free(fontBuffer);
+	//free(bitmap);
+}
+
+
 
 class DemoVRApp: public MinVR::VRApp {
 
@@ -44,6 +176,102 @@ private:
 
   std::string _vertexFile;
   std::string _fragmentFile;
+
+
+  void ft_drawString(char * filename, char * text, glm::vec3 color)
+  {
+	  FT_Library    library;
+	  FT_Face       face;
+
+	  FT_GlyphSlot  slot;
+	  FT_Matrix     matrix;                 /* transformation matrix */
+	  FT_Vector     pen;                    /* untransformed origin  */
+	  FT_Error      error;
+
+	  double        angle;
+	  int           target_height;
+	  int           n, num_chars;
+
+	  target_height = HEIGHT;
+
+	  num_chars = strlen(text);
+	  angle = 0.0; // (25.0 / 360) * 3.14159 * 2;      /* use 25 degrees     */
+
+	  error = FT_Init_FreeType(&library);              /* initialize library */
+													   /* error handling omitted */
+
+	  error = FT_New_Face(library, filename, 0, &face);/* create face object */
+													   /* error handling omitted */
+
+													   /* use 50pt at 100dpi */
+	  error = FT_Set_Char_Size(face, 50 * 64, 0,
+		  100, 0);                /* set character size */
+								  /* error handling omitted */
+
+	  slot = face->glyph;
+
+	  /* set up matrix */
+	  matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
+	  matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
+	  matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
+	  matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
+
+	  /* the pen position in 26.6 cartesian space coordinates; */
+	  /* start at (300,200) relative to the upper left corner  */
+	  pen.x = 0 * 64;
+	  pen.y = (target_height - 64) * 64;
+
+	  for (n = 0; n < num_chars; n++)
+	  {
+		  /* set transformation */
+		  FT_Set_Transform(face, &matrix, &pen);
+
+		  /* load glyph image into the slot (erase previous one) */
+		  error = FT_Load_Char(face, text[n], FT_LOAD_RENDER);
+		  if (error)
+			  continue;                 /* ignore errors */
+
+										/* now, draw to our target surface (convert position) */
+		  draw_bitmap(&slot->bitmap,
+			  slot->bitmap_left,
+			  target_height - slot->bitmap_top);
+
+		  /* increment pen position */
+		  pen.x += slot->advance.x;
+		  pen.y += slot->advance.y;
+	  }
+
+	  //show_image();
+
+	  FT_Done_Face(face);
+	  FT_Done_FreeType(library);
+
+	  glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
+
+	  GLuint texture;
+	  glGenTextures(1, &texture);
+	  //glBindTexture(GL_TEXTURE_2D, texture);
+
+	  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	  glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, WIDTH, HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, &image[0]);
+
+	  //glGenTextures(1, &texture);
+	  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, slot->bitmap.width, slot->bitmap.rows, 0,
+	  //	GL_ALPHA, GL_UNSIGNED_BYTE, slot->bitmap.buffer);
+	  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT,
+	  //	0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0,
+	  //	GL_ALPHA, GL_UNSIGNED_BYTE, image);
+	  //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	  //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  }
+
 
 
   FT_Library _ft_library;
@@ -214,8 +442,11 @@ private:
 
     // Create a list of lights.  If the shader you're using doesn't use
     // lighting, and the shapes don't have textures, this is irrelevant.
-    _lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f),
-                      glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+    //_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f),
+     //                 glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+
+	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f),
+		glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
 
     // Create a shader manager and load the light list.
     _shader->addLights(_lights);
@@ -373,7 +604,9 @@ public:
 
       //bsg::bsgUtils::printMat("view", viewMatrix);
       _scene.draw(viewMatrix, projMatrix);
-	  RenderText("Testing", 0, 0, 2.0, glm::vec3(1.0, 0.0, 0.0));
+	  //drawString("Testing", 200, 50, 50);
+	  ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0));
+	  //stbi_write_png("outft.png", WIDTH, HEIGHT, 1, image, WIDTH);
 
 
       // We let MinVR swap the graphics buffers.
