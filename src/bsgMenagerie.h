@@ -46,6 +46,8 @@ class drawableCube : public drawableCompound {
  public:
   drawableCube(bsgPtr<shaderMgr> pShader, const int &tesselation, const glm::vec4 &color);
 
+  void setTexture(int width, int height, unsigned char *image, char side);
+
 };
 
 

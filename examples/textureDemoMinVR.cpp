@@ -7,15 +7,15 @@
 #include FT_GLYPH_H
 
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h" /* http://nothings.org/stb/stb_image_write.h */
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+//#include "stb_image_write.h" /* http://nothings.org/stb/stb_image_write.h */
 
 #define STB_TRUETYPE_IMPLEMENTATION 
 #include "stb_truetype.h" /* http://nothings.org/stb/stb_truetype.h */
 
 
-#define WIDTH   640
-#define HEIGHT  480
+#define WIDTH   512
+#define HEIGHT  512
 
 
 /* origin is the upper left corner */
@@ -44,96 +44,8 @@ void draw_bitmap(FT_Bitmap*  bitmap,
 }
 
 
-void show_image(void)
-{
-	int  i, j;
-
-
-	for (i = 0; i < HEIGHT; i++)
-	{
-		for (j = 0; j < WIDTH; j++)
-			putchar(image[i][j] == 0 ? ' '
-				: image[i][j] < 128 ? '+'
-				: '*');
-		putchar('\n');
-	}
-}
-
-
 
 /* EOF */
-
-void drawString(char* word, int texture_width, int texture_height, int line_height)
-{
-	
-	///* load font file */
-
-	//FILE* fontFile = fopen("../fonts/arial.ttf", "rb");
-	//fseek(fontFile, 0, SEEK_END);
-	//const long size = ftell(fontFile); /* how long is the file ? */
-	//fseek(fontFile, 0, SEEK_SET); /* reset */
-
-	//unsigned char* fontBuffer = new unsigned char[size];
-
-	//fread(fontBuffer, size, 1, fontFile);
-	//fclose(fontFile);
-
-	///* prepare font */
-	//stbtt_fontinfo info;
-	//if (!stbtt_InitFont(&info, fontBuffer, 0))
-	//{
-	//	printf("failed\n");
-	//}
-
-	//int b_w = texture_width; /* bitmap width */
-	//int b_h = texture_height; /* bitmap height */
-	//int l_h = line_height; /* line height */
-
-	//			  /* create a bitmap for the phrase */
-	//unsigned char* bitmap =  new unsigned char[b_w * b_h];
-
-	///* calculate font scaling */
-	//float scale = stbtt_ScaleForPixelHeight(&info, l_h);
-
-	//int x = 0;
-
-	//int ascent, descent, lineGap;
-	//stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
-
-	//ascent *= scale;
-	//descent *= scale;
-
-	//int i;
-	//for (i = 0; i < strlen(word); ++i)
-	//{
-	//	/* get bounding box for character (may be offset to account for chars that dip above or below the line */
-	//	int c_x1, c_y1, c_x2, c_y2;
-	//	stbtt_GetCodepointBitmapBox(&info, word[i], scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
-
-	//	/* compute y (different characters have different heights */
-	//	int y = ascent + c_y1;
-
-	//	/* render character (stride and offset is important here) */
-	//	int byteOffset = x + (y  * b_w);
-	//	stbtt_MakeCodepointBitmap(&info, bitmap + byteOffset, c_x2 - c_x1, c_y2 - c_y1, b_w, scale, scale, word[i]);
-
-	//	/* how wide is this character */
-	//	int ax;
-	//	stbtt_GetCodepointHMetrics(&info, word[i], &ax, 0);
-	//	x += ax * scale;
-
-	//	/* add kerning */
-	//	int kern;
-	//	kern = stbtt_GetCodepointKernAdvance(&info, word[i], word[i + 1]);
-	//	x += kern * scale;
-	//}
-
-	///* save out a 1 channel image */
-	//stbi_write_png("out.png", b_w, b_h, 1, bitmap, b_w);
-
-	//free(fontBuffer);
-	//free(bitmap);
-}
 
 
 
@@ -178,7 +90,7 @@ private:
   std::string _fragmentFile;
 
 
-  void ft_drawString(char * filename, char * text, glm::vec3 color)
+  void ft_drawString(char * filename, char * text, glm::vec3 color, char side)
   {
 	  FT_Library    library;
 	  FT_Face       face;
@@ -248,18 +160,8 @@ private:
 
 	  glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
 
-	  GLuint texture;
-	  glGenTextures(1, &texture);
-	  //glBindTexture(GL_TEXTURE_2D, texture);
-
-	  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	  glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, WIDTH, HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, &image[0]);
+	  _cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
+	  memset(image, 0, sizeof image);
 
 	  //glGenTextures(1, &texture);
 	  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, slot->bitmap.width, slot->bitmap.rows, 0,
@@ -286,85 +188,7 @@ private:
 
   std::map<GLchar, Character> Characters;
 
-  void _initializeCharacters() {
-	  glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
-
-	  for (GLubyte c = 0; c < 128; c++)
-	  {
-		  // Load character glyph 
-		  if (FT_Load_Char(_ft_face, c, FT_LOAD_RENDER))
-		  {
-			  std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-			  continue;
-		  }
-		  // Generate texture
-		  GLuint texture;
-		  glGenTextures(1, &texture);
-		  glBindTexture(GL_TEXTURE_2D, texture);
-		  glTexImage2D(
-			  GL_TEXTURE_2D,
-			  0,
-			  GL_RED,
-			  _ft_face->glyph->bitmap.width,
-			  _ft_face->glyph->bitmap.rows,
-			  0,
-			  GL_RED,
-			  GL_UNSIGNED_BYTE,
-			  _ft_face->glyph->bitmap.buffer
-		  );
-		  // Set texture options
-		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		  // Now store character for later use
-		  Character character = {
-			  texture,
-			  glm::ivec2(_ft_face->glyph->bitmap.width, _ft_face->glyph->bitmap.rows),
-			  glm::ivec2(_ft_face->glyph->bitmap_left, _ft_face->glyph->bitmap_top),
-			  _ft_face->glyph->advance.x
-		  };
-		  Characters.insert(std::pair<GLchar, Character>(c, character));
-	  }
-  }
-
-  void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
-  {
-	  // Activate corresponding render state	
-	  bsg::textureMgr *texture = new bsg::textureMgr();
-
-	  _shader->addTexture(texture);
-
-	  glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
-
-	  // Iterate through all characters
-	  std::string::const_iterator c;
-	  for (c = text.begin(); c != text.end(); c++)
-	  {
-		  Character ch = Characters[*c];
-
-		  GLfloat xpos = x + ch.Bearing.x * scale;
-		  GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-
-		  GLfloat w = ch.Size.x * scale;
-		  GLfloat h = ch.Size.y * scale;
-		  // Update VBO for each character
-		  GLfloat vertices[6][4] = {
-			  { xpos,     ypos + h,   0.0, 0.0 },
-			  { xpos,     ypos,       0.0, 1.0 },
-			  { xpos + w, ypos,       1.0, 1.0 },
-
-			  { xpos,     ypos + h,   0.0, 0.0 },
-			  { xpos + w, ypos,       1.0, 1.0 },
-			  { xpos + w, ypos + h,   1.0, 0.0 }
-		  };
-
-		  texture->_textureBufferID = ch.TextureID;
-
-		  // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-		  x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
-	  }
-  }
+  
 
   // These functions from demo2.cpp are not needed here:
   //
@@ -462,9 +286,9 @@ private:
     _shader->compileShaders();
 
     // Add a texture to our shader manager object.
-    bsg::bsgPtr<bsg::textureMgr> texture = new bsg::textureMgr();
-    texture->readFile(bsg::texturePNG, "../data/gladiolas-sq.png");
-    _shader->addTexture(texture);
+    //bsg::bsgPtr<bsg::textureMgr> texture = new bsg::textureMgr();
+    //texture->readFile(bsg::texturePNG, "../data/gladiolas-sq.png");
+    //_shader->addTexture(texture);
     
     // We could put the axes and the rectangle in the same compound
     // shape, but we leave them separate so they can be moved
@@ -486,6 +310,13 @@ private:
 
     // Now add the axes.
     _scene.addObject(_axesSet);
+
+	ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 'f');
+	  ft_drawString("../fonts/arial.ttf", "1", glm::vec3(1.0, 1.0, 1.0), 'b');
+	  ft_drawString("../fonts/arial.ttf", "2", glm::vec3(1.0, 1.0, 1.0), 'u');
+	  ft_drawString("../fonts/arial.ttf", "3", glm::vec3(1.0, 1.0, 1.0), 'd');
+	  ft_drawString("../fonts/arial.ttf", "4", glm::vec3(1.0, 1.0, 1.0), 'l');
+	  ft_drawString("../fonts/arial.ttf", "5", glm::vec3(1.0, 1.0, 1.0), 'r');
 
     // All the shapes are now added to the scene.
   }
@@ -605,7 +436,7 @@ public:
       //bsg::bsgUtils::printMat("view", viewMatrix);
       _scene.draw(viewMatrix, projMatrix);
 	  //drawString("Testing", 200, 50, 50);
-	  ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0));
+	  
 	  //stbi_write_png("outft.png", WIDTH, HEIGHT, 1, image, WIDTH);
 
 
