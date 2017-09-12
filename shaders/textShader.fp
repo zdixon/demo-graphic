@@ -18,15 +18,20 @@ varying vec4 lightPositionCS;
 uniform sampler2D textureImage;
 uniform vec4 lightPositionWS[NUM_LIGHTS];
 uniform vec4 lightColor[NUM_LIGHTS];
-uniform vec3 textColor;
 
+uniform vec3 textcolor;
 
 void main() {
 
   vec4 materialColor = texture2D(textureImage, uvFrag);
-  float brightness = materialColor.r;
-  materialColor = vec4(brightness * textColor, 1.0);  
-
+  
+  
+  if(materialColor.r != 0.0) {
+	materialColor = materialColor.x * vec4(textcolor.x, textcolor.y, textcolor.z, 1.0);
+  } else {
+	materialColor = vec4(1.0, 1.0, 1.0, 1.0);
+  }
+  
   //vec4 materialColor = colorFrag;
   //0.6 * vec4(1.0, 1.0, 1.0, 1.0);
   float ambientCoefficient = 0.3;

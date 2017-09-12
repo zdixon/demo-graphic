@@ -90,7 +90,7 @@ private:
   std::string _fragmentFile;
 
 
-  void ft_drawString(char * filename, char * text, glm::vec3 color, char side)
+  void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side)
   {
 	  FT_Library    library;
 	  FT_Face       face;
@@ -116,7 +116,7 @@ private:
 													   /* error handling omitted */
 
 													   /* use 50pt at 100dpi */
-	  error = FT_Set_Char_Size(face, 50 * 64, 0,
+	  error = FT_Set_Char_Size(face, fontSize * 64, 0,
 		  100, 0);                /* set character size */
 								  /* error handling omitted */
 
@@ -131,7 +131,7 @@ private:
 	  /* the pen position in 26.6 cartesian space coordinates; */
 	  /* start at (300,200) relative to the upper left corner  */
 	  pen.x = 0 * 64;
-	  pen.y = (target_height - 64) * 64;
+	  pen.y = (target_height - fontSize) * 64;
 
 	  for (n = 0; n < num_chars; n++)
 	  {
@@ -311,12 +311,12 @@ private:
     // Now add the axes.
     _scene.addObject(_axesSet);
 
-	ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 'f');
-	  ft_drawString("../fonts/arial.ttf", "1", glm::vec3(1.0, 1.0, 1.0), 'b');
-	  ft_drawString("../fonts/arial.ttf", "2", glm::vec3(1.0, 1.0, 1.0), 'u');
-	  ft_drawString("../fonts/arial.ttf", "3", glm::vec3(1.0, 1.0, 1.0), 'd');
-	  ft_drawString("../fonts/arial.ttf", "4", glm::vec3(1.0, 1.0, 1.0), 'l');
-	  ft_drawString("../fonts/arial.ttf", "5", glm::vec3(1.0, 1.0, 1.0), 'r');
+	ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
+	  ft_drawString("../fonts/arial.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
+	  ft_drawString("../fonts/arial.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100, 'u');
+	  ft_drawString("../fonts/arial.ttf", "3", glm::vec3(0.0, 1.0, 0.0), 100, 'd');
+	  ft_drawString("../fonts/arial.ttf", "4", glm::vec3(1.0, 1.0, 0.0), 100, 'l');
+	  ft_drawString("../fonts/arial.ttf", "5", glm::vec3(1.0, 1.0, 1.0), 100, 'r');
 
     // All the shapes are now added to the scene.
   }
@@ -434,6 +434,7 @@ public:
                                         vm[12],vm[13],vm[14],vm[15]);
 
       //bsg::bsgUtils::printMat("view", viewMatrix);
+
       _scene.draw(viewMatrix, projMatrix);
 	  //drawString("Testing", 200, 50, 50);
 	  
