@@ -6,6 +6,7 @@ build/*
 !build/*.sh
 CVS/
 Win32/
+.DS_Store
 
 # Compiled Object files
 *.slo

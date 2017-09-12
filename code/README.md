@@ -1,4 +1,4 @@
-#Fumeng's adds
+# Fumeng's adds
 1. I tried to compile the project using a higher version of CMake. Make sure you have installed it. (Version 3.1.0)
 
 2. I'm lazy, so I wrote a script (build/auto-build.sh) to compile the whole thing.
