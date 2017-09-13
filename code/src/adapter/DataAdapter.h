@@ -3,7 +3,7 @@
  *
  *  Created on: Jul 21, 2017
  *      Author: fm
- *      This class will translate
+ *      This class will translate 
  */
 
 #ifndef SRC_ADAPTER_DATAADAPTER_H_
@@ -33,6 +33,7 @@ public:
 	void getResult(InterfaceData & interDims, InterfaceData & cubeDims);
 
 	bool isOpen();
+	
 private:
 	bool _isOpen;
 	DBHandler _dbhandler;
