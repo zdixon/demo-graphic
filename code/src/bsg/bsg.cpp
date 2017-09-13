@@ -1,8 +1,12 @@
 #include "bsg.h"
+#include <string>
 
 // Stb Image library
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h" /* http://nothings.org/stb/stb_image_write.h */
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -777,6 +781,33 @@ void drawableObj::_loadSeparate() {
 }
 
 
+
+void drawableObj::setTexture(int width, int height, unsigned char image[]) {
+
+	_hasTexture = true;
+
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_2D, _texture);
+
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int random = rand();
+	//stbi_write_png((std::to_string(random) + std::string("outtestbefore.png")).c_str(), 512, 512, 1, &image[0], 512);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, &image[0]);
+	char test[512][512];
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, &test[0]);
+	//stbi_write_png((std::to_string(random) + std::string("outtest.png")).c_str(), 512, 512, 1, test, 512);
+
+}
+
 void drawableObj::draw() {
 
   // Enable all the attribute arrays we'll use.
@@ -784,8 +815,10 @@ void drawableObj::draw() {
   if (!_colors.empty()) glEnableVertexAttribArray(_colors.ID);
   if (!_normals.empty()) glEnableVertexAttribArray(_normals.ID);
   if (!_uvs.empty()) glEnableVertexAttribArray(_uvs.ID);
-
-  if (_interleaved) {
+ 
+  if (_hasTexture) {
+	  _drawTexture();
+  } else if (_interleaved) {
     _drawInterleaved();
   } else {
     _drawSeparate();
@@ -797,6 +830,43 @@ void drawableObj::draw() {
   if (!_colors.empty()) glDisableVertexAttribArray(_colors.ID);
   if (!_normals.empty()) glDisableVertexAttribArray(_normals.ID);
   if (!_uvs.empty()) glDisableVertexAttribArray(_uvs.ID);
+}
+
+void drawableObj::_drawTexture() {
+	glBindTexture(GL_TEXTURE_2D, _texture);
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cerr << "OpenGL error: " << gluErrorString(err) << std::endl;
+	}
+	//int random = rand();
+
+	//char test[512][512];
+	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, &test[0]);
+	//stbi_write_png((std::to_string(random) + std::string("outtest.png")).c_str(), 512, 512, 1, test, 512);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _vertices.bufferID);
+
+	glVertexAttribPointer(_vertices.ID, _vertices.componentsPerVertex(),
+		GL_FLOAT, 0, 0, 0);
+
+	if (!_colors.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, _colors.bufferID);
+		glVertexAttribPointer(_colors.ID, _colors.componentsPerVertex(),
+			GL_FLOAT, 0, 0, 0);
+	}
+	if (!_normals.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, _normals.bufferID);
+		glVertexAttribPointer(_normals.ID, _normals.componentsPerVertex(),
+			GL_FLOAT, 0, 0, 0);
+	}
+	if (!_uvs.empty()) {
+		glBindBuffer(GL_ARRAY_BUFFER, _uvs.bufferID);
+		glVertexAttribPointer(_uvs.ID, _uvs.componentsPerVertex(),
+			GL_FLOAT, 0, 0, 0);
+	}
+
+
+	glDrawArrays(_drawType, 0, _count);
 }
 
 void drawableObj::_drawInterleaved() {

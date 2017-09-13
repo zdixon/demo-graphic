@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 	// Initialize the app.
 	DemoVRApp app(argc, argv);
 
-	app.test();
+	// app.test();
 	// Run it.
 	app.run();
 

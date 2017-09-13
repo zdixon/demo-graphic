@@ -399,12 +399,14 @@ class textureMgr {
     _textureAttribName = std::string("textureImage");
   };
 
-  GLuint _textureBufferID;
 
   GLuint _loadPNG(const std::string imagePath);
   GLuint _loadCheckerBoard (const int size, int numFields);
   
  public:
+  
+  GLuint _textureBufferID;
+
   textureMgr() { _setupDefaultNames(); };
 
   /// \brief Reads a texture from an image file.
@@ -432,6 +434,8 @@ class textureMgr {
   GLfloat getWidth() { return _width; };
   /// \brief Return the texture height.
   GLfloat getHeight() { return _height; };
+
+
 };
 
 
@@ -600,8 +604,13 @@ class drawableObj {
   // an optimization.  The vertex position is always zero, and the
   // vertices array is not optional, so there is no vertexPos variable.
   bool _interleaved;
+  bool _hasTexture;
   GLshort _colorPos, _normalPos, _uvPos, _stride;
   drawableObjData<float> _interleavedData;
+  GLuint _texture;
+  int _width;
+  int _height;
+
 
   void _getAttribLocations(GLuint programID);
   void _prepareSeparate(GLuint programID);
@@ -610,6 +619,7 @@ class drawableObj {
   void _loadInterleaved();
   void _drawSeparate();
   void _drawInterleaved();
+  void _drawTexture();
 
  public:
  drawableObj() :
@@ -617,8 +627,11 @@ class drawableObj {
     _interleaved(false),
     _selectable(true),
     _boundingBoxMin(0.1),
-    _haveBoundingBox(false) {};
+    _haveBoundingBox(false),
+	_hasTexture(false) {};
 
+
+  void setTexture(int width, int height, unsigned char image[]);
   /// \brief Set up the buffers to be interleaved,
   void setInterleaved(bool interleaved) { _interleaved = interleaved; };
 

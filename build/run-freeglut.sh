@@ -1,3 +1,3 @@
 #!/bin/sh
 
-bin/main ../code/shaders/shaderSimple.vp ../code/shaders/shaderSimple.fp -c ../code/config/desktop-freeglut.xml
+bin/main ../shaders/textShader.vp ../shaders/textShader.fp -c ../code/config/desktop-freeglut-3.xml

@@ -6,6 +6,7 @@ include_directories(
   ${GLM_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIRS}
   ${PNG_INCLUDE_DIRS}
+  ${FREETYPE_INCLUDE_DIRS}
   )
 
 set(bsg_headers bsg.h bsgMenagerie.h bsgObjModel.h)

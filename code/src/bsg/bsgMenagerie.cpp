@@ -378,6 +378,7 @@ namespace bsg {
       rect->setDrawType(GL_TRIANGLE_STRIP, verts.size());
     }
 
+  
 
   drawableCube::drawableCube(bsgPtr<shaderMgr> pShader,
                                        const int &tesselation, const glm::vec4 &color) :
@@ -405,6 +406,34 @@ namespace bsg {
       addObject(_top);
       addObject(_bottom);
     }
+
+  void drawableCube::setTexture(int width, int height, unsigned char *image, char side) {
+	  switch (side)
+	  {
+	  case 'f':
+		_front->setTexture(width, height, image);
+		break;
+	  case 'b':
+		  _back->setTexture(width, height, image);
+		  break;
+	  case 'u':
+		  _top->setTexture(width, height, image);
+		  break;
+	  case 'd':
+		  _bottom->setTexture(width, height, image);
+		  break;
+	  case 'l':
+		  _left->setTexture(width, height, image);
+		  break;
+	  case 'r':
+		  _right->setTexture(width, height, image);
+		  break;
+
+	  default:
+		  _front->setTexture(width, height, image);
+		  break;
+	  }
+  }
 
   drawableCone::drawableCone(bsgPtr<shaderMgr> pShader,
                                        const int &heightTesselation, const int &thetaTesselation, const glm::vec4 &color) :
