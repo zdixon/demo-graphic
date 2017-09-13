@@ -24,6 +24,8 @@ private:
 	bsg::drawableCollection* _modelGroup;
 	bsg::drawableObjModel* _model;
 	bsg::drawableObjModel* _orbiter;
+	bsg::drawableCube* _cube;
+  	bsg::drawableRectangle* _rectangle;
 
 	// These are part of the animation stuff, and again are out here with
 	// the big boy global variables so they can be available to both the
@@ -67,6 +69,8 @@ private:
 
 public:
 	void test();
+
+	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side);
 
 	DemoVRApp(int argc, char** argv);
 

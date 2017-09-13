@@ -13,7 +13,11 @@
       ${MYSQL_LIBRARY}
   )
   
+    # add_executable(main  textureDemoMinVR.cpp)
+    # add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp)
     add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp)
+
+
 
     target_link_libraries(main bsg db ds adapter
      ${MINVR_LIBRARY}

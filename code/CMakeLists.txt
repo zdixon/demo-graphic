@@ -79,6 +79,14 @@ message("-- MinVR library:    " ${MINVR_LIBRARY})
 #set(GLM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/glm-0.9.7.1)
 message("-- GLM includes:     " ${GLM_INCLUDE_DIR})
 
+find_package(FreeGLUT REQUIRED)
+message("-- FreeGLUT includes:" ${FREEGLUT_INCLUDE_DIR})
+message("-- FreeGLUT library: " ${FREEGLUT_LIBRARY})
+
+find_package(Freetype REQUIRED)
+message("-- Freetype includes:" ${FREETYPE_INCLUDE_DIRS})
+message("-- Freetype library: " ${FREETYPE_LIBRARIES})
+message("-- Freetype found: " ${FREETYPE_FOUND})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code -- Not sure why pthreads or dl is required.  This
@@ -97,7 +105,7 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # Apple-specific code
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOSX -lmysqlcppconn ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOSX -lmysqlcppconn -L/usr/local/opt/freetype/lib -lfreetype -I/usr/local/opt/freetype/include -I/usr/local/opt/freetype/include/freetype2")
   set(MYSQL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include")
   set(MYSQL_INCLUDE_CPPCONN_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include/cppconn")
   set(MYSQL_LIBRARY "${CMAKE_SOURCE_DIR}/external/mysql/macos/lib")
