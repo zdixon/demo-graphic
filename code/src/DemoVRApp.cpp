@@ -443,7 +443,6 @@ void DemoVRApp::_initializeScene() {
     _scene.addObject(_rectangle);
 	_scene.addObject(_cube);
 
-
 	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shader2.vp");
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
 	_axesShader->compileShaders();
@@ -452,6 +451,9 @@ void DemoVRApp::_initializeScene() {
 
 // Now add the axes.
 	_scene.addObject(_axesSet);
+
+	// Some fonts cause segfaults for no good reason on some platforms (Mac). For example, '2', '3', and '5' in 
+	// Arial causes the crash, but other characters/fonts do not. Just use times.
 
 	ft_drawString("../fonts/times.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
 	ft_drawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
@@ -494,7 +496,6 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 		// exit(0);
 		_scene.prepare();
 		}
-//		std::cout << "onVRRenderGraphicsContext end" << std::endl;
 	
 }
 
@@ -506,7 +507,6 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 /// last time it was drawn.
 void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 // Only draw if the application is still running.
-//	std::cout << "onVRRenderGraphics starts" << std::endl;
 	if (isRunning()) {
        // If you want to adjust the positions of the various objects in
       // your scene, you can do that here.
@@ -548,6 +548,41 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
       //bsg::bsgUtils::printMat("view", viewMatrix);
 
       _scene.draw(viewMatrix, projMatrix);
+
+      //bsg::bsgUtils::printMat("view", viewMatrix);
+      //bsg::bsgUtils::printMat("proj", projMatrix);
+		// If you want to adjust the positions of the various objects in
+		// your scene, you can do that here.
+		/*
+		_orbiter->setPosition(3.0f * cos(_oscillator), 3.0, 3.0 * sin(_oscillator));
+		_orbiter->setOrientation(glm::quat(0.5 * cos(_oscillator * 1.1f), 0.0, cos(_oscillator), sin(_oscillator)));
+		_modelGroup->setPosition(cos(_oscillator / 1.2f), -2.2f + sin(_oscillator / 1.2f), -10.0);
+		_modelGroup->setOrientation(
+				glm::quat(0.5 * cos(_oscillator * 0.1f), 0.0, cos(_oscillator * 0.2f), sin(_oscillator * 0.2f)));
+
+		// Now the preliminaries are done, on to the actual drawing.
+
+		// First clear the display.
+		glClear(
+		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		// Second the load() step.  We let MinVR give us the projection
+		// matrix from the render state argument to this method.
+		const float* pm = renderState.getProjectionMatrix();
+		glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6], pm[7], pm[8], pm[9], pm[10],
+				pm[11], pm[12], pm[13], pm[14], pm[15]);
+		_scene.load();
+
+		// The draw step.  We let MinVR give us the view matrix.
+		const float* vm = renderState.getViewMatrix();
+		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4], vm[5], vm[6], vm[7], vm[8], vm[9], vm[10],
+				vm[11], vm[12], vm[13], vm[14], vm[15]);
+
+		//bsg::bsgUtils::printMat("view", viewMatrix);
+		_scene.draw(viewMatrix, projMatrix);
+
+		// We let MinVR swap the graphics buffers.
+		// glutSwapBuffers();*/
 
 	}
 
