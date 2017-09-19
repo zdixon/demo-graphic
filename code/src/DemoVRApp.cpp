@@ -475,14 +475,17 @@ void DemoVRApp::_initializeScene() {
     _scene.addObject(_rectangle);
 	_scene.addObject(_cube);
 
-	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shaderSimple.vp");
-	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shaderSimple.fp");
+	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shader2.vp");
+	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
 	_axesShader->compileShaders();
 
 	_axesSet = new bsg::drawableAxes(_axesShader, 100.0f);
 
 // Now add the axes.
 	_scene.addObject(_axesSet);
+
+	// Some fonts cause segfaults for no good reason on some platforms (Mac). For example, '2', '3', and '5' in 
+	// Arial causes the crash, but other characters/fonts do not. Just use times.
 
 	ft_drawString("../fonts/times.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
 	ft_drawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
@@ -540,7 +543,6 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 		// exit(0);
 		_scene.prepare();
 		}
-		std::cout << "onVRRenderGraphicsContext end" << std::endl;
 	
 }
 
@@ -552,7 +554,6 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 /// last time it was drawn.
 void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 // Only draw if the application is still running.
-	std::cout << "onVRRenderGraphics starts" << std::endl;
 	if (isRunning()) {
        // If you want to adjust the positions of the various objects in
       // your scene, you can do that here.
@@ -594,8 +595,8 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
       //bsg::bsgUtils::printMat("view", viewMatrix);
 
       _scene.draw(viewMatrix, projMatrix);
-      bsg::bsgUtils::printMat("view", viewMatrix);
-      bsg::bsgUtils::printMat("proj", projMatrix);
+      //bsg::bsgUtils::printMat("view", viewMatrix);
+      //bsg::bsgUtils::printMat("proj", projMatrix);
 		// If you want to adjust the positions of the various objects in
 		// your scene, you can do that here.
 		/*
