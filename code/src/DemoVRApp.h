@@ -5,11 +5,13 @@
 #include "ds/Cube.h"
 
 #include <api/MinVR.h>
+#include <vector>
 
 class DemoVRApp: public MinVR::VRApp {
 
 	// private members of the VRApp.
 private:
+	int _stage;
 	Cube _testCube;
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where
@@ -68,8 +70,6 @@ private:
 	void _initializeScene();
 
 public:
-	void test();
-
 	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side);
 
 	DemoVRApp(int argc, char** argv);
@@ -93,5 +93,9 @@ public:
 	/// re-draws the scene according to whatever has changed since the
 	/// last time it was drawn.
 	void onVRRenderGraphics(const MinVR::VRGraphicsState &renderState);
+
+	void updateStage();
+
+	void dataToCubes(vector<Dimension<string> >& dims, void* arr);
 };
 

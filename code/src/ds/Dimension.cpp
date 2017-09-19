@@ -239,7 +239,7 @@ void Dimension<T>::setValues(std::vector<T> ts) {
 }
 
 /*
- * define whatever you need here
+ * define whatever you need heregetConnection
  */
 template class Dimension<std::string> ;
 template class Dimension<int> ;
