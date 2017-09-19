@@ -86,8 +86,7 @@ DemoVRApp::DemoVRApp(int argc, char** argv) :
 													   /* error handling omitted */
 
 													   /* use 50pt at 100dpi */
-	  error = FT_Set_Char_Size(face, fontSize * 64, 0,
-		  100, 0);                /* set character size */
+	  error = FT_Set_Char_Size(face, fontSize * 64, 0, 100, 0);                /* set character size */
 								  /* error handling omitted */
 
 	  slot = face->glyph;
@@ -495,7 +494,7 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 		// exit(0);
 		_scene.prepare();
 		}
-		std::cout << "onVRRenderGraphicsContext end" << std::endl;
+//		std::cout << "onVRRenderGraphicsContext end" << std::endl;
 	
 }
 
@@ -507,7 +506,7 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 /// last time it was drawn.
 void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 // Only draw if the application is still running.
-	std::cout << "onVRRenderGraphics starts" << std::endl;
+//	std::cout << "onVRRenderGraphics starts" << std::endl;
 	if (isRunning()) {
        // If you want to adjust the positions of the various objects in
       // your scene, you can do that here.
