@@ -131,23 +131,55 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 }
 
 void DemoVRApp::updateStage() {
-	void *ptr = NULL;
 	vector<Dimension<string> > test = vector<Dimension<string> >();
+	Dimension<string> x = Dimension<string>("Time");
+	x.addNonRepValue("2010");
+	x.addNonRepValue("2011");
+	x.addNonRepValue("2012");
+	Dimension<string> y = Dimension<string>("Location");
+	y.addNonRepValue("MA");
+	y.addNonRepValue("RI");
+	y.addNonRepValue("NY");
+	Dimension<string> z = Dimension<string>("Type");
+	z.addNonRepValue("New");
+	z.addNonRepValue("Old");
+
+	int X = x.getSize();
+	int Y = y.getSize();
+	int Z = z.getSize();
+
+	Array3D arr (boost::extents[X][Y][Z]);
+
+	for(int xi = 0; xi < x.getSize(); xi++){
+		for(int yi = 0; yi < y.getSize(); yi++){
+			for(int zi = 0; zi < z.getSize(); zi++){
+				arr[xi][yi][zi] = std::rand() / 100.0;
+				std::cout << arr[xi][yi][zi] << " " ;
+			}
+		}
+	}
+
+//	 int values = 0;
+//	  for(arrIndex i = 0; i != 3; ++i)
+//	    for(arrIndex j = 0; j != 4; ++j)
+//	      for(arrIndex k = 0; k != 2; ++k)
+//	        arr[i][j][k] = values++;
+
 	switch(_stage) {
 	   case 1:
 		   std::cout << "============Stage 1============" <<std::endl;
- 		   dataToCubes(test, ptr);
+ 		   dataToCubes(test, arr);
 	      break;
 	   case 3 :
 		   std::cout << "============Stage 2============" <<std::endl;
-		   dataToCubes(test, ptr);
+		   dataToCubes(test, arr);
 	      break;
 
 	}
 
 }
 
-void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, void* arr) {
+void DemoVRApp::dataToCubes(const vector<Dimension<string> >& dims, const Array3D& arr) {
 
 }
 

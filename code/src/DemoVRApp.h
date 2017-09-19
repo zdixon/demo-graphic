@@ -5,7 +5,11 @@
 #include "ds/Cube.h"
 
 #include <api/MinVR.h>
+#include "boost/multi_array.hpp"
 #include <vector>
+typedef boost::multi_array<double, 3> Array3D;
+typedef Array3D::index arrIndex;
+
 
 class DemoVRApp: public MinVR::VRApp {
 
@@ -96,6 +100,6 @@ public:
 
 	void updateStage();
 
-	void dataToCubes(vector<Dimension<string> >& dims, void* arr);
+	void dataToCubes(const vector<Dimension<string> >& dims, const Array3D & arr);
 };
 
