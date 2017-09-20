@@ -146,13 +146,13 @@ void DemoVRApp::updateStage() {
 
 	int X = x.getSize();
 	int Y = y.getSize();
-	int Z = z.getSize();
+	int Z = 1;//z.getSize();
 
 	Array3D arr (boost::extents[X][Y][Z]);
 
 	for(int xi = 0; xi < x.getSize(); xi++){
 		for(int yi = 0; yi < y.getSize(); yi++){
-			for(int zi = 0; zi < z.getSize(); zi++){
+			for(int zi = 0; zi < 1; zi++){
 				arr[xi][yi][zi] = std::rand() / 100.0;
 				std::cout << arr[xi][yi][zi] << " " ;
 			}
