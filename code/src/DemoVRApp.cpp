@@ -283,11 +283,11 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		shutdown();
 	} else if (event.getName() == "FrameStart") {
 		_oscillator = event.getDataAsFloat("ElapsedSeconds");
-	} else if (event.getName() == "KbdLeft_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		if (_stage > 0)
 			_stage--;
 		updateStage();
-	} else if (event.getName() == "KbdRight_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
 		updateStage();
 	}
