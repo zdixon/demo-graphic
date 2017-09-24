@@ -112,6 +112,10 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(DYLD_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/external/mysql/macos/lib")
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  set(MYSQL_INCLUDE_DIR "${MYSQL_INCLUDE_DIR}" " C:/Program Files/boost_1_65_1")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set (CMAKE_INSTALL_PREFIX "${${PROJECT_NAME}_SOURCE_DIR}/build/install"
     CACHE PATH "default install path" FORCE )

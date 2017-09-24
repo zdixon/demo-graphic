@@ -30,7 +30,7 @@ public:
 	virtual ~DataAdapter();
 	void open();
 	void close();
-	void getResult(InterfaceData & interDims, InterfaceData & cubeDims);
+	void getResult(string, vector<Dimension<string> >  &);
 	void getDimensionValues(Dimension<string> & odim, Dimension<string> & rdim);
 	void getFirstResult(vector<Dimension<string> > & dims, double & v);
 
@@ -44,9 +44,9 @@ private:
 	void parseFloatDimensions(SQL & sql, vector<Dimension<float> > & fds);
 	void parseIntDimensions(SQL & sql, vector<Dimension<int> > & ids);
 	void parseStringDimensions(SQL & sql, vector<Dimension<string> > & sds);
-	void parseResultSet(sql::ResultSet * rs, InterfaceData & cubeDims);
 	void parseResultSet(sql::ResultSet * rs, double & v);
 	void parseResultSet(sql::ResultSet * rs, Dimension<string> & dim);
+	void parseResultSet(sql::ResultSet * rs, vector<Dimension<string> > & dims);
 	void parseStringDimension(SQL & sql, Dimension<string> & dim);
 
 	string parseSQL(SQL sql);

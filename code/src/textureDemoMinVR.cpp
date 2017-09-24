@@ -90,7 +90,7 @@ private:
   std::string _fragmentFile;
 
 // from here
-  void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side)
+  void FTDrawString(char * filename, char * text, glm::vec3 color, int fontSize, char side)
   {
 	  FT_Library    library;
 	  FT_Face       face;
@@ -311,12 +311,12 @@ private:
     // Now add the axes.
     _scene.addObject(_axesSet);
 
-	  ft_drawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
-	  ft_drawString("../fonts/arial.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
-	  ft_drawString("../fonts/arial.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100, 'u');
-	  ft_drawString("../fonts/arial.ttf", "3", glm::vec3(0.0, 1.0, 0.0), 100, 'd');
-	  ft_drawString("../fonts/arial.ttf", "4", glm::vec3(1.0, 1.0, 0.0), 100, 'l');
-	  ft_drawString("../fonts/arial.ttf", "5", glm::vec3(1.0, 1.0, 1.0), 100, 'r');
+	  FTDrawString("../fonts/arial.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
+	  FTDrawString("../fonts/arial.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
+	  FTDrawString("../fonts/arial.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100, 'u');
+	  FTDrawString("../fonts/arial.ttf", "3", glm::vec3(0.0, 1.0, 0.0), 100, 'd');
+	  FTDrawString("../fonts/arial.ttf", "4", glm::vec3(1.0, 1.0, 0.0), 100, 'l');
+	  FTDrawString("../fonts/arial.ttf", "5", glm::vec3(1.0, 1.0, 1.0), 100, 'r');
 
     // All the shapes are now added to the scene.
   }

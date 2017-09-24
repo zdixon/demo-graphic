@@ -56,7 +56,7 @@ std::string Dimension<T>::getName() {
  */
 template<typename T>
 T Dimension<T>::getValueAt(int i) {
-	if (_valueVector.size() < i - 1) {
+	if (_valueVector.size() < i + 1) {
 		throw std::out_of_range("i");
 	}
 	return _valueVector.at(i);
@@ -115,6 +115,11 @@ void Dimension<T>::printValues() {
 template<typename T>
 int Dimension<T>::getSize() {
 	return _valueVector.size();
+}
+
+template<typename T>
+int Dimension<T>::getNonRepSize() {
+	return _valueSet.size();
 }
 /**
  *
@@ -247,6 +252,7 @@ void Dimension<T>::clean() {
 }
 
 /*
+
  * define whatever you need heregetConnection
  */
 template class Dimension<std::string> ;

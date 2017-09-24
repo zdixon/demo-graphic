@@ -59,6 +59,8 @@ public:
 	// get the size of value
 	int getSize();
 
+	int getNonRepSize();
+
 	// get the operator
 	std::string getOperator();
 
