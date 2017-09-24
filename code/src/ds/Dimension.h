@@ -16,7 +16,7 @@
 #include <vector>
 
 typedef bool empty;
-using namespace std;
+//using namespace std;
 
 template<typename T>
 class Dimension {
@@ -25,27 +25,27 @@ public:
 	Dimension();
 
 	// constructor with an initial setting of name
-	Dimension(string str);
+	Dimension(std::string str);
 
 	// constructor with an initial setting of name and value
-	Dimension(string n, T v);
+	Dimension(std::string n, T v);
 
 	virtual ~Dimension();
 
 	// get the name of this dimension
-	string getName();
+	std::string getName();
 
 	// get the value
 	T getValueAt(int i);
 
 	// get all the values
-	void getRepValues(vector<T> & vs);
+	void getRepValues(std::vector<T> & vs);
 
 	// get the path of levels
-	void getPath(vector<string> & p);
+	void getPath(std::vector<std::string> & p);
 
 	// get current level
-	string getCurrentLevel();
+	std::string getCurrentLevel();
 
 	// print the content of this dimension, name and values
 	void print();
@@ -60,7 +60,7 @@ public:
 	int getSize();
 
 	// get the operator
-	string getOperator();
+	std::string getOperator();
 
 	// get the first / min value of the value set
 	T getFirstValue();
@@ -75,37 +75,39 @@ public:
 	void addRepValue(T v);
 
 	// add a level to the path
-	void addPath(string p);
+	void addPath(std::string p);
 
 	// remove last one
 	void removeLastItemOnPath();
 
 	// set the name of the dimension
-	void setName(string str);
+	void setName(std::string str);
 
 	// set the operator
-	void setOperator(string str);
+	void setOperator(std::string str);
 
 	// set all values
-	void setValues(vector<T>);
+	void setValues(std::vector<T>);
 
 	// sort
 	void sort();
+
+	void clean();
 
 protected:
 	std::string _name;
 
 	// the set is an inner structure to check if elements are distinguishable
-	set<T> _valueSet;
+	std::set<T> _valueSet;
 
 	// the structure to store actually data
-	vector<T> _valueVector;
+	std::vector<T> _valueVector;
 
 	// store the path of values
-	vector<string> _path;
+	std::vector<std::string> _path;
 
 	// the operator we wanna apply, by default, it is "sum"
-	string _operator;
+	std::string _operator;
 
 	// print set for debug purposes
 	void printSet();

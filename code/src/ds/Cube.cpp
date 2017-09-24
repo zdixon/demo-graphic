@@ -47,7 +47,7 @@ void Cube::setInterfaceDimensions(vector<Dimension<int> > ids, vector<Dimension<
  */
 void Cube::queryDatabase() {
 	_adapter.getResult(_interfaceDims, _cubeDims);
-	computerCubes();
+
 }
 
 void Cube::printData() {
@@ -56,5 +56,5 @@ void Cube::printData() {
 /**
  *
  */
-void Cube::computerCubes() {
+void Cube::computeCubes() {
 }

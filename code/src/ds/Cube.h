@@ -23,7 +23,7 @@ public:
 	void setInterfaceDimensions(vector<Dimension<int> > ids,
 			vector<Dimension<float> > fds, vector<Dimension<string> > sds);
 	void queryDatabase();
-	void computerCubes();
+	void computeCubes();
 	void printData();
 
 private:

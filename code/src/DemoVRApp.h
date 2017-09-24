@@ -3,13 +3,21 @@
 #include "bsg/bsgObjModel.h"
 #include "ds/Dimension.h"
 #include "ds/Cube.h"
+#include "adapter/DataAdapter.h"
 
 #include <api/MinVR.h>
+#include "boost/multi_array.hpp"
+#include <vector>
+
+typedef boost::multi_array<double, 3> Array3D;
+typedef Array3D::index arrIndex;
+
 
 class DemoVRApp: public MinVR::VRApp {
 
 	// private members of the VRApp.
 private:
+	int _stage;
 	Cube _testCube;
 	// The scene and the objects in it must be available from the main()
 	// function where it is created and the renderScene() function where
@@ -47,6 +55,7 @@ private:
 
 	std::string _vertexFile;
 	std::string _fragmentFile;
+	DataAdapter _adapter;
 
 	// These functions from demo2.cpp are not needed here:
 	//
@@ -68,8 +77,6 @@ private:
 	void _initializeScene();
 
 public:
-	void test();
-
 	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side);
 
 	DemoVRApp(int argc, char** argv);
@@ -93,5 +100,14 @@ public:
 	/// re-draws the scene according to whatever has changed since the
 	/// last time it was drawn.
 	void onVRRenderGraphics(const MinVR::VRGraphicsState &renderState);
+
+	void updateStage();
+
+	void dataToCubes(const vector<Dimension<string> >& dims, const Array3D & arr);
+
+	void stage1();
+
+	void getValueArray( vector<Dimension<string> > & dims, Array3D & arr);
+
 };
 

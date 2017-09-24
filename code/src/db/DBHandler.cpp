@@ -88,18 +88,22 @@ int DBHandler::getConnection() {
 
 sql::ResultSet* DBHandler::exeQuery(std::string sql) {
 	if (sql != "") {
+
 		std::cout << "final sql is " << sql << std::endl;
+
 		try {
 			sql::ResultSet *res;
+
 			res = m_stmt->executeQuery(sql);
-//			while (res->next()) {
-//				std::cout << "    ... MySQL replies: ";
-//				/* Access column data by alias or column name */
-//				std::cout << res->getString("Value") << std::endl;
-//				std::cout << "    ... MySQL says it again: ";
-//				/* Access column data by numeric offset, 1 is the first column */
-//				std::cout << res->getString(1) << std::endl;
-//			}
+
+			while (res->next()) {
+				std::cout << "    ... MySQL replies: ";
+				/* Access column data by alias or column name */
+				std::cout << res->getString("Value") << std::endl;
+				std::cout << "    ... MySQL says it again: ";
+				/* Access column data by numeric offset, 1 is the first column */
+				std::cout << res->getString(1) << std::endl;
+			}
 			return res;
 		} catch (sql::SQLException &e) {
 			std::cout << "# ERR: SQLException in " << __FILE__;

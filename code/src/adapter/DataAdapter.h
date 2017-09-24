@@ -31,6 +31,8 @@ public:
 	void open();
 	void close();
 	void getResult(InterfaceData & interDims, InterfaceData & cubeDims);
+	void getDimensionValues(Dimension<string> & odim, Dimension<string> & rdim);
+	void getFirstResult(vector<Dimension<string> > & dims, double & v);
 
 	bool isOpen();
 	
@@ -43,6 +45,10 @@ private:
 	void parseIntDimensions(SQL & sql, vector<Dimension<int> > & ids);
 	void parseStringDimensions(SQL & sql, vector<Dimension<string> > & sds);
 	void parseResultSet(sql::ResultSet * rs, InterfaceData & cubeDims);
+	void parseResultSet(sql::ResultSet * rs, double & v);
+	void parseResultSet(sql::ResultSet * rs, Dimension<string> & dim);
+	void parseStringDimension(SQL & sql, Dimension<string> & dim);
+
 	string parseSQL(SQL sql);
 
 };
