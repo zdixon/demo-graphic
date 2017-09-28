@@ -236,8 +236,9 @@ void DemoVRApp::processKeys(unsigned char key) {
 
 
 void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
-	std::cout << "dataToCubes" << std::endl;
+	
 	int numDims = dims.size();
+	std::cout << "dataToCubes. numDims " << numDims << std::endl;
 	switch (numDims)
 	{
 	case 1:
@@ -249,7 +250,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		int ySize = dims[1].getSize();
 		int zSize = dims[2].getSize();
 
-		std::cout << "xSize" << xSize << "ySize" << ySize << "zSize" << zSize << std::endl;
+		std::cout << "xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
 
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
 		float cubeScale = 5.0 / maxSize;
@@ -385,7 +386,7 @@ void DemoVRApp::_initializeScene() {
 	_scene.addObject(_axesSet);
 	std::cout << "cubes: " << cubes.size() << std::endl;
 	if (cubes.size()) {
-		for each (bsg::drawableCube *cb in cubes)
+		for(bsg::drawableCube *cb : cubes)
 		{
 			std::cout << "added cube" << std::endl;
 			_scene.addObject(cb);

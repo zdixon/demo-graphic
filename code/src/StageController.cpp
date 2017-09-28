@@ -58,9 +58,9 @@ void StageController::stage0(vector<Dimension<string> > & dims) {
 			"ORDER BY 'Time';";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
-//	for (Dimension<string> v : dims) {
-//		v.print();
-//	}
+	for (Dimension<string> v : dims) {
+		v.print();
+	}
 
 }
 void StageController::stage1(vector<Dimension<string> > & dims) {
@@ -73,6 +73,7 @@ void StageController::stage1(vector<Dimension<string> > & dims) {
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
+
 void StageController::stage2(vector<Dimension<string> > & dims) {
 	string sql =
 			"SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time', KPI_BUSINESS_NM as 'Business', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
@@ -225,4 +226,5 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 		std::cout << std::endl;
 
 	}
+	dims = dimsRefined;
 }
