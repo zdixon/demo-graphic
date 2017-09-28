@@ -41,6 +41,7 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 		stage5(dims);
 		break;
 	case 6:
+		cout << "#####THE LAST STAGE IS NOT WORKING#######" << endl;
 		stage6(dims);
 		break;
 	}
