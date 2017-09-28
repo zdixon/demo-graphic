@@ -6,6 +6,7 @@
 
 #include <api/MinVR.h>
 #include "boost/multi_array.hpp"
+#include "boost/lexical_cast.hpp"
 #include <vector>
 typedef boost::multi_array<double, 3> Array3D;
 typedef Array3D::index arrIndex;
@@ -31,7 +32,10 @@ private:
 	bsg::drawableObjModel* _model;
 	bsg::drawableObjModel* _orbiter;
 	bsg::drawableCube* _cube;
+	bsg::drawableCube* _cube2;
   	bsg::drawableRectangle* _rectangle;
+
+	std::set<bsg::drawableCube *> cubes;
 
 	// These are part of the animation stuff, and again are out here with
 	// the big boy global variables so they can be available to both the
@@ -72,9 +76,11 @@ private:
 	void _showCameraPosition();
 
 	void _initializeScene();
+	void processKeys(unsigned char key);
 
 public:
-	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side);
+	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side, bsg::drawableCube *cube);
+	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, bsg::drawableCube *cube);
 
 	DemoVRApp(int argc, char** argv);
 
@@ -100,6 +106,6 @@ public:
 
 	void updateStage();
 
-	void dataToCubes(const vector<Dimension<string> >& dims, const Array3D & arr);
+	void dataToCubes(vector<Dimension<string> >& dims, Array3D & arr);
 };
 

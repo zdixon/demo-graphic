@@ -49,7 +49,17 @@ DemoVRApp::DemoVRApp(int argc, char** argv) :
 }
 
 void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
-		int fontSize, char side) {
+	int fontSize, bsg::drawableCube *cube) {
+	ft_drawString(filename, text, color, fontSize, 'f', cube);
+	ft_drawString(filename, text, color, fontSize, 'b', cube);
+	ft_drawString(filename, text, color, fontSize, 'u', cube);
+	ft_drawString(filename, text, color, fontSize, 'd', cube);
+	ft_drawString(filename, text, color, fontSize, 'l', cube);
+	ft_drawString(filename, text, color, fontSize, 'r', cube);
+}
+
+void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
+		int fontSize, char side, bsg::drawableCube *cube) {
 	FT_Library library;
 	FT_Face face;
 
@@ -116,7 +126,7 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"),
 			color.x, color.y, color.z);
 
-	_cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
+	cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
 	memset(image, 0, sizeof image);
 
 	//glGenTextures(1, &texture);
@@ -143,18 +153,22 @@ void DemoVRApp::updateStage() {
 	Dimension<string> z = Dimension<string>("Type");
 	z.addNonRepValue("New");
 	z.addNonRepValue("Old");
+	z.addNonRepValue("Current");
+	test.push_back(x);
+	test.push_back(y);
+	test.push_back(z);
 
 	int X = x.getSize();
 	int Y = y.getSize();
-	int Z = 1;//z.getSize();
+	int Z = z.getSize();
 
 	Array3D arr (boost::extents[X][Y][Z]);
 
-	for(int xi = 0; xi < x.getSize(); xi++){
-		for(int yi = 0; yi < y.getSize(); yi++){
-			for(int zi = 0; zi < 1; zi++){
+	for(int xi = 0; xi < X; xi++){
+		for(int yi = 0; yi < Y; yi++){
+			for(int zi = 0; zi < Z; zi++){
 				arr[xi][yi][zi] = std::rand() / 100.0;
-				std::cout << arr[xi][yi][zi] << " " ;
+				std::cout << arr[xi][yi][zi] << " " << std::endl;
 			}
 		}
 	}
@@ -170,7 +184,7 @@ void DemoVRApp::updateStage() {
 		   std::cout << "============Stage 1============" <<std::endl;
  		   dataToCubes(test, arr);
 	      break;
-	   case 3 :
+	   case 2 :
 		   std::cout << "============Stage 2============" <<std::endl;
 		   dataToCubes(test, arr);
 	      break;
@@ -179,8 +193,118 @@ void DemoVRApp::updateStage() {
 
 }
 
-void DemoVRApp::dataToCubes(const vector<Dimension<string> >& dims, const Array3D& arr) {
+void DemoVRApp::processKeys(unsigned char key) {
 
+	// Each press of a key changes a dimension by this amount. If you
+	// want things to go faster, increase this step.
+	float step = 0.5f;
+
+	std::cout << "Key: " << key << std::endl;
+	_showCameraPosition();
+
+	// This function processes only the 'normal' keys.  The arrow keys
+	// don't appear here, nor mouse events.
+	switch (key) {
+	case 27:
+		exit(0);
+
+		// These next few are for steering the position of the viewer.
+	case 'a':
+		_scene.addToCameraPosition(glm::vec3(-step, 0.0f, 0.0f));
+		break;
+	case 'q':
+		_scene.addToCameraPosition(glm::vec3(step, 0.0f, 0.0f));
+		break;
+	case 's':
+		_scene.addToCameraPosition(glm::vec3(0.0f, -step, 0.0f));
+		break;
+	case 'w':
+		_scene.addToCameraPosition(glm::vec3(0.0f, step, 0.0f));
+		break;
+	case 'd':
+		_scene.addToCameraPosition(glm::vec3(0.0f, 0.0f, -step));
+		break;
+	case 'e':
+		_scene.addToCameraPosition(glm::vec3(0.0f, 0.0f, step));
+		break;
+
+		// These next are for steering the position of where you're looking.
+	case 'j':
+		_scene.addToLookAtPosition(glm::vec3(-step, 0.0f, 0.0f));
+		break;
+	case 'u':
+		_scene.addToLookAtPosition(glm::vec3(step, 0.0f, 0.0f));
+		break;
+	case 'k':
+		_scene.addToLookAtPosition(glm::vec3(0.0f, -step, 0.0f));
+		break;
+	case 'i':
+		_scene.addToLookAtPosition(glm::vec3(0.0f, step, 0.0f));
+		break;
+	case 'l':
+		_scene.addToLookAtPosition(glm::vec3(0.0f, 0.0f, -step));
+		break;
+	case 'o':
+		_scene.addToLookAtPosition(glm::vec3(0.0f, 0.0f, step));
+		break;
+	}
+}
+
+void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
+	std::cout << "dataToCubes" << std::endl;
+	int numDims = dims.size();
+	switch (numDims)
+	{
+	case 1:
+		break;
+	case 2:
+		break;
+	default:
+		int xSize = dims[0].getSize();
+		int ySize = dims[1].getSize();
+		int zSize = dims[2].getSize();
+
+		std::cout << "xSize" << xSize << "ySize" << ySize << "zSize" << zSize << std::endl;
+
+		int maxSize = std::max(std::max(xSize, ySize), zSize);
+		float cubeScale = 5.0 / maxSize;
+		float xPos = 0.0;
+		float yPos = 0.0;
+		float zPos = 0.0;
+		float step = cubeScale * 1.1;
+		for (int x = 0; x < xSize; x++) {
+			for (int y = 0; y < ySize; y++) {
+				for (int z = 0; z < zSize; z++) {
+					std::cout << "Adding Cube" << std::endl;
+					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
+						glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+					std::cout << cube << std::endl;
+					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
+					std::vector<char> char_array(dbl.begin(), dbl.end());
+					char_array.push_back(0);
+
+					ft_drawString("../fonts/times.ttf", &char_array[0],
+						glm::vec3(1.0, 1.0, 1.0), 100, cube);
+					cube->setScale(cubeScale);
+					cube->setPosition(glm::vec3(xPos + (x * step), yPos - (y * step), zPos + (z * step)));
+					std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
+					cubes.insert(cube);
+
+					std::cout << "Added cube" << std::endl;
+				}
+			}
+		}
+		std::cout << "After added cube..." << std::endl;
+		_scene = bsg::scene();
+		_shader = new bsg::shaderMgr();
+		_axesShader = new bsg::shaderMgr();
+		_lights = new bsg::lightList();
+		_oscillator = 0.0f;
+		_initializeScene();
+		// exit(0);
+		_scene.prepare();
+		break;
+	}
 }
 
 // This contains a bunch of sanity checks from the graphics
@@ -273,8 +397,8 @@ void DemoVRApp::_initializeScene() {
 	_rectangle = new bsg::drawableRectangle(_shader, 9.0f, 9.0f, 2);
 
 	// Now add our rectangle to the scene.
-	_scene.addObject(_rectangle);
-	_scene.addObject(_cube);
+	//_scene.addObject(_rectangle);
+	//_scene.addObject(_cube);
 
 	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shader2.vp");
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
@@ -284,22 +408,32 @@ void DemoVRApp::_initializeScene() {
 
 	// Now add the axes.
 	_scene.addObject(_axesSet);
+	std::cout << "cubes: " << cubes.size() << std::endl;
+	if (cubes.size()) {
+		for each (bsg::drawableCube *cb in cubes)
+		{
+			std::cout << "added cube" << std::endl;
+			_scene.addObject(cb);
+		}
+		cubes.clear();
+	}
+
 
 	// Some fonts cause segfaults for no good reason on some platforms (Mac). For example, '2', '3', and '5' in 
 	// Arial causes the crash, but other characters/fonts do not. Just use times.
 
-	ft_drawString("../fonts/times.ttf", "Lorem ipsum dolor",
-			glm::vec3(1.0, 1.0, 1.0), 20, 'f');
+	/*ft_drawString("../fonts/times.ttf", "Lorem ipsum dolor",
+			glm::vec3(1.0, 1.0, 1.0), 20, 'f', _cube);
 	ft_drawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100,
-			'b');
+			'b', _cube);
 	ft_drawString("../fonts/times.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100,
-			'u');
+			'u', _cube);
 	ft_drawString("../fonts/times.ttf", "0123456789", glm::vec3(0.0, 1.0, 0.0),
-			100, 'd');
+			100, 'd', _cube);
 	ft_drawString("../fonts/times.ttf", "times", glm::vec3(1.0, 1.0, 0.0), 100,
-			'l');
+			'l', _cube);
 	ft_drawString("../fonts/times.ttf", "value", glm::vec3(1.0, 1.0, 1.0), 100,
-			'r');
+			'r', _cube);*/
 // so far so good
 }
 
@@ -320,6 +454,10 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 	} else if (event.getName() == "Kbd" && event.getDataAsCharArray("EventString")[0] == 'D'){ //
 		_stage++;
 		updateStage();
+	}
+	else if (event.getName().length() > 4 && event.getName().substr(0, 3) == "Kbd") {
+		std::cout << event.getName() << std::endl;
+		processKeys(event.getName().at(3));
 	}
 
 }
@@ -367,6 +505,7 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 		pos.x = pos.y;
 		pos.y = temp;
 		_cube->setPosition(pos);
+		_cube->setScale(1.0);
 
 		_cube->setRotation(
 				glm::vec3(cos(_oscillator), cos(_oscillator) * M_PI, 0.0f));
@@ -385,6 +524,8 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 				pm[13], pm[14], pm[15]);
 		_scene.load();
 
+
+
 		// The draw step.  We let MinVR give us the view matrix.
 		const float* vm = renderState.getViewMatrix();
 		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4],
@@ -393,7 +534,7 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 
 		//bsg::bsgUtils::printMat("view", viewMatrix);
 
-		_scene.draw(viewMatrix, projMatrix);
+		_scene.draw(_scene.getViewMatrix(), _scene.getProjMatrix());
 
 		//bsg::bsgUtils::printMat("view", viewMatrix);
 		//bsg::bsgUtils::printMat("proj", projMatrix);

@@ -835,9 +835,6 @@ void drawableObj::draw() {
 void drawableObj::_drawTexture() {
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		std::cerr << "OpenGL error: " << gluErrorString(err) << std::endl;
-	}
 	//int random = rand();
 
 	//char test[512][512];
