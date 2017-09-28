@@ -53,7 +53,6 @@ int DBHandler::getConnection() {
 	const std::string database(EXAMPLE_DB);
 
 	std::cout << "Connector/C++ tutorial framework..." << std::endl;
-	std::cout << std::endl;
 
 	try {
 
@@ -63,7 +62,8 @@ int DBHandler::getConnection() {
 		m_con = driver->connect(url, user, pass);
 		m_con->setSchema(database);
 		m_stmt = m_con->createStatement();
-
+		std::cout << "Connector/C++ tutorial framework...successful!" << std::endl;
+		std::cout << m_stmt << std::endl;
 		return 0;
 
 	} catch (sql::SQLException &e) {
@@ -88,10 +88,16 @@ int DBHandler::getConnection() {
 
 sql::ResultSet* DBHandler::exeQuery(std::string sql) {
 	if (sql != "") {
+
 		std::cout << "final sql is " << sql << std::endl;
+
 		try {
 			sql::ResultSet *res;
+			std::cout << m_stmt << std::endl;
 			res = m_stmt->executeQuery(sql);
+
+			res->beforeFirst();
+
 //			while (res->next()) {
 //				std::cout << "    ... MySQL replies: ";
 //				/* Access column data by alias or column name */

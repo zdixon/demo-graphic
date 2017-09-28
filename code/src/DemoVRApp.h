@@ -3,14 +3,12 @@
 #include "bsg/bsgObjModel.h"
 #include "ds/Dimension.h"
 #include "ds/Cube.h"
+#include "StageController.h"
 
 #include <api/MinVR.h>
 #include "boost/multi_array.hpp"
 #include "boost/lexical_cast.hpp"
 #include <vector>
-typedef boost::multi_array<double, 3> Array3D;
-typedef Array3D::index arrIndex;
-
 
 class DemoVRApp: public MinVR::VRApp {
 
@@ -57,6 +55,7 @@ private:
 
 	std::string _vertexFile;
 	std::string _fragmentFile;
+	StageController _controller;
 
 	// These functions from demo2.cpp are not needed here:
 	//
@@ -107,5 +106,7 @@ public:
 	void updateStage();
 
 	void dataToCubes(vector<Dimension<string> >& dims, Array3D & arr);
+	void setExamples(vector<Dimension<string> > & dims, Array3D & arr);
+
 };
 

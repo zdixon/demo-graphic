@@ -1,9 +1,11 @@
 #include "DemoVRApp.h"
 #include "ds/Dimension.h"
+#include "StageController.h"
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <ft2build.h>
+
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
@@ -28,8 +30,6 @@ void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 	}
 }
 
-// These functions from demo2.cpp are not needed here:
-//
 //    init()
 //    makeWindow()
 //    resizeWindow()
@@ -38,10 +38,9 @@ void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 // The functionality of these methods is assumed by the MinVR apparatus.
 
 DemoVRApp::DemoVRApp(int argc, char** argv) :
-		MinVR::VRApp(argc, argv), _scene(bsg::scene()), _shader(
-				new bsg::shaderMgr()), _axesShader(new bsg::shaderMgr()), _lights(
-				new bsg::lightList()), _oscillator(0.0f), _testCube(Cube()), _stage(
-				0) {
+		MinVR::VRApp(argc, argv), _scene(bsg::scene()), _shader(new bsg::shaderMgr()), _axesShader(
+				new bsg::shaderMgr()), _lights(new bsg::lightList()), _oscillator(0.0f), _testCube(Cube()), _controller(
+				StageController()), _stage(-1) {
 
 	_vertexFile = std::string(argv[1]);
 	_fragmentFile = std::string(argv[2]);
@@ -50,12 +49,7 @@ DemoVRApp::DemoVRApp(int argc, char** argv) :
 
 void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	int fontSize, bsg::drawableCube *cube) {
-	ft_drawString(filename, text, color, fontSize, 'f', cube);
-	ft_drawString(filename, text, color, fontSize, 'b', cube);
-	ft_drawString(filename, text, color, fontSize, 'u', cube);
-	ft_drawString(filename, text, color, fontSize, 'd', cube);
-	ft_drawString(filename, text, color, fontSize, 'l', cube);
-	ft_drawString(filename, text, color, fontSize, 'r', cube);
+	ft_drawString(filename, text, color, fontSize, 'a', cube);
 }
 
 void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
@@ -90,10 +84,10 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	slot = face->glyph;
 
 	/* set up matrix */
-	matrix.xx = (FT_Fixed) (cos(angle) * 0x10000L);
-	matrix.xy = (FT_Fixed) (-sin(angle) * 0x10000L);
-	matrix.yx = (FT_Fixed) (sin(angle) * 0x10000L);
-	matrix.yy = (FT_Fixed) (cos(angle) * 0x10000L);
+	matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
+	matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
+	matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
+	matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
 
 	/* the pen position in 26.6 cartesian space coordinates; */
 	// start at (300,200) relative to the upper left corner
@@ -110,8 +104,7 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 			continue; /* ignore errors */
 
 		/* now, draw to our target surface (convert position) */
-		draw_bitmap(&slot->bitmap, slot->bitmap_left,
-				target_height - slot->bitmap_top);
+		draw_bitmap(&slot->bitmap, slot->bitmap_left, target_height - slot->bitmap_top);
 
 		/* increment pen position */
 		pen.x += slot->advance.x;
@@ -123,8 +116,7 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
 
-	glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"),
-			color.x, color.y, color.z);
+	glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
 
 	cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
 	memset(image, 0, sizeof image);
@@ -139,9 +131,8 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
-
-void DemoVRApp::updateStage() {
-	vector<Dimension<string> > test = vector<Dimension<string> >();
+void DemoVRApp::setExamples(vector<Dimension<string> > & dims, Array3D & arr) {
+	dims = vector<Dimension<string> >();
 	Dimension<string> x = Dimension<string>("Time");
 	x.addNonRepValue("2010");
 	x.addNonRepValue("2011");
@@ -154,43 +145,36 @@ void DemoVRApp::updateStage() {
 	z.addNonRepValue("New");
 	z.addNonRepValue("Old");
 	z.addNonRepValue("Current");
-	test.push_back(x);
-	test.push_back(y);
-	test.push_back(z);
+	dims.push_back(x);
+	dims.push_back(y);
+	dims.push_back(z);
 
 	int X = x.getSize();
 	int Y = y.getSize();
 	int Z = z.getSize();
 
-	Array3D arr (boost::extents[X][Y][Z]);
+	arr.resize(boost::extents[X][Y][Z]);
 
 	for(int xi = 0; xi < X; xi++){
 		for(int yi = 0; yi < Y; yi++){
 			for(int zi = 0; zi < Z; zi++){
-				arr[xi][yi][zi] = std::rand() / 100.0;
+				arr[xi][yi][zi] = std::rand() / 10000.0;
 				std::cout << arr[xi][yi][zi] << " " << std::endl;
 			}
 		}
 	}
-
 //	 int values = 0;
 //	  for(arrIndex i = 0; i != 3; ++i)
 //	    for(arrIndex j = 0; j != 4; ++j)
 //	      for(arrIndex k = 0; k != 2; ++k)
 //	        arr[i][j][k] = values++;
-
-	switch(_stage) {
-	   case 1:
-		   std::cout << "============Stage 1============" <<std::endl;
- 		   dataToCubes(test, arr);
-	      break;
-	   case 2 :
-		   std::cout << "============Stage 2============" <<std::endl;
-		   dataToCubes(test, arr);
-	      break;
-
-	}
-
+}
+void DemoVRApp::updateStage() {
+	vector<Dimension<string> > dims;
+	Array3D arr;
+	setExamples(dims, arr);
+	_controller.setUpDimsArr(dims, arr, _stage);
+	dataToCubes(dims, arr);
 }
 
 void DemoVRApp::processKeys(unsigned char key) {
@@ -250,6 +234,7 @@ void DemoVRApp::processKeys(unsigned char key) {
 	}
 }
 
+
 void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	std::cout << "dataToCubes" << std::endl;
 	int numDims = dims.size();
@@ -278,8 +263,8 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					std::cout << "Adding Cube" << std::endl;
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-					std::cout << cube << std::endl;
 					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
+					std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
 					char_array.push_back(0);
 
@@ -287,7 +272,8 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						glm::vec3(1.0, 1.0, 1.0), 100, cube);
 					cube->setScale(cubeScale);
 					cube->setPosition(glm::vec3(xPos + (x * step), yPos - (y * step), zPos + (z * step)));
-					std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
+					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << ", z: " << z << "/" << zSize << std::endl;
+					//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
 					cubes.insert(cube);
 
 					std::cout << "Added cube" << std::endl;
@@ -333,7 +319,7 @@ void DemoVRApp::_checkContext() {
 	}
 
 // This is the background color of the viewport.
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(1.0, 1.0, 1.0, 0.0);
 
 // Now we're ready to start issuing OpenGL calls.  Start by enabling
 // the modes we want.  The DEPTH_TEST is how you get hidden faces.
@@ -357,11 +343,9 @@ void DemoVRApp::_checkContext() {
 // in a non-graphical sense.
 void DemoVRApp::_showCameraPosition() {
 
-	std::cout << "Camera is at (" << _scene.getCameraPosition().x << ", "
-			<< _scene.getCameraPosition().y << ", "
+	std::cout << "Camera is at (" << _scene.getCameraPosition().x << ", " << _scene.getCameraPosition().y << ", "
 			<< _scene.getCameraPosition().z << ")... ";
-	std::cout << "looking at (" << _scene.getLookAtPosition().x << ", "
-			<< _scene.getLookAtPosition().y << ", "
+	std::cout << "looking at (" << _scene.getLookAtPosition().x << ", " << _scene.getLookAtPosition().y << ", "
 			<< _scene.getLookAtPosition().z << ")." << std::endl;
 }
 
@@ -369,29 +353,20 @@ void DemoVRApp::_initializeScene() {
 
 // Create a list of lights.  If the shader you're using doesn't use
 // lighting, and the shapes don't have textures, this is irrelevant.
-	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f),
-			glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
 
 // Create a shader manager and load the light list.
 	_shader->addLights(_lights);
 
-	// _vertexFile = "../code/shaders/textureShader.vp";
-	// _fragmentFile = "../code/shaders/textureShader.fp";
-
 // Add the shaders to the manager, first the vertex shader...
 
 	_shader->addShader(bsg::GLSHADER_VERTEX, _vertexFile);
-
-// ... then the fragment shader.  You could potentially add a
-// geometry shader at this point.
 	_shader->addShader(bsg::GLSHADER_FRAGMENT, _fragmentFile);
-// std::cout << _vertexFile << " " << _fragmentFile << std::endl;
 
 // The shaders are loaded, now compile them.
 	_shader->compileShaders();
 
-	_cube = new bsg::drawableCube(_shader, 10,
-			glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
+	_cube = new bsg::drawableCube(_shader, 10, glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
 	_cube->setScale(2.0f);
 
 	_rectangle = new bsg::drawableRectangle(_shader, 9.0f, 9.0f, 2);
@@ -434,6 +409,12 @@ void DemoVRApp::_initializeScene() {
 			'l', _cube);
 	ft_drawString("../fonts/times.ttf", "value", glm::vec3(1.0, 1.0, 1.0), 100,
 			'r', _cube);*/
+//	FTDrawString("../fonts/times.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
+//	FTDrawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
+//	FTDrawString("../fonts/times.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100, 'u');
+//	FTDrawString("../fonts/times.ttf", "0123456789", glm::vec3(0.0, 1.0, 0.0), 100, 'd');
+//	FTDrawString("../fonts/times.ttf", "times", glm::vec3(1.0, 1.0, 0.0), 100, 'l');
+//	FTDrawString("../fonts/times.ttf", "value", glm::vec3(1.0, 1.0, 1.0), 100, 'r');
 // so far so good
 }
 
@@ -446,12 +427,15 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 
 // Quit if the escape button is pressed
 
-
 	if (event.getName() == "KbdEsc_Down") {
 		shutdown();
 	} else if (event.getName() == "FrameStart") {
 		_oscillator = event.getDataAsFloat("ElapsedSeconds");
-	} else if (event.getName() == "Kbd" && event.getDataAsCharArray("EventString")[0] == 'D'){ //
+	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+		if (_stage > 0)
+			_stage--;
+		updateStage();
+	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
 		updateStage();
 	}
@@ -459,7 +443,6 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		std::cout << event.getName() << std::endl;
 		processKeys(event.getName().at(3));
 	}
-
 }
 
 /// brief Set the render context.
@@ -468,13 +451,11 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 /// apparatus.  Some render calls are shared among multiple views,
 /// for example a stereo view has two renders, with the same render
 /// context.
-void DemoVRApp::onVRRenderGraphicsContext(
-		const MinVR::VRGraphicsState &renderState) {
+void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderState) {
 
 // Check if this is the first call.  If so, do some initialization.
 	if (renderState.isInitialRenderCall()) {
 		_checkContext();
-
 		_initializeScene();
 		// exit(0);
 		_scene.prepare();
@@ -507,69 +488,31 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 		_cube->setPosition(pos);
 		_cube->setScale(1.0);
 
-		_cube->setRotation(
-				glm::vec3(cos(_oscillator), cos(_oscillator) * M_PI, 0.0f));
+		_cube->setRotation(glm::vec3(cos(_oscillator), cos(_oscillator) * M_PI, 0.0f));
 		// Now the preliminaries are done, on to the actual drawing.
 
 		// First clear the display.
 		glClear(
-				GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
-						| GL_STENCIL_BUFFER_BIT);
+		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		// Second the load() step.  We let MinVR give us the projection
 		// matrix from the render state argument to this method.
 		const float* pm = renderState.getProjectionMatrix();
-		glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4],
-				pm[5], pm[6], pm[7], pm[8], pm[9], pm[10], pm[11], pm[12],
-				pm[13], pm[14], pm[15]);
+		glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6], pm[7], pm[8], pm[9], pm[10],
+				pm[11], pm[12], pm[13], pm[14], pm[15]);
 		_scene.load();
 
 
 
 		// The draw step.  We let MinVR give us the view matrix.
 		const float* vm = renderState.getViewMatrix();
-		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4],
-				vm[5], vm[6], vm[7], vm[8], vm[9], vm[10], vm[11], vm[12],
-				vm[13], vm[14], vm[15]);
-
-		//bsg::bsgUtils::printMat("view", viewMatrix);
+		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4], vm[5], vm[6], vm[7], vm[8], vm[9], vm[10],
+				vm[11], vm[12], vm[13], vm[14], vm[15]);
 
 		_scene.draw(_scene.getViewMatrix(), _scene.getProjMatrix());
 
 		//bsg::bsgUtils::printMat("view", viewMatrix);
 		//bsg::bsgUtils::printMat("proj", projMatrix);
-		// If you want to adjust the positions of the various objects in
-		// your scene, you can do that here.
-		/*
-		 _orbiter->setPosition(3.0f * cos(_oscillator), 3.0, 3.0 * sin(_oscillator));
-		 _orbiter->setOrientation(glm::quat(0.5 * cos(_oscillator * 1.1f), 0.0, cos(_oscillator), sin(_oscillator)));
-		 _modelGroup->setPosition(cos(_oscillator / 1.2f), -2.2f + sin(_oscillator / 1.2f), -10.0);
-		 _modelGroup->setOrientation(
-		 glm::quat(0.5 * cos(_oscillator * 0.1f), 0.0, cos(_oscillator * 0.2f), sin(_oscillator * 0.2f)));
-
-		 // Now the preliminaries are done, on to the actual drawing.
-
-		 // First clear the display.
-		 glClear(
-		 GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		 // Second the load() step.  We let MinVR give us the projection
-		 // matrix from the render state argument to this method.
-		 const float* pm = renderState.getProjectionMatrix();
-		 glm::mat4 projMatrix = glm::mat4(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6], pm[7], pm[8], pm[9], pm[10],
-		 pm[11], pm[12], pm[13], pm[14], pm[15]);
-		 _scene.load();
-
-		 // The draw step.  We let MinVR give us the view matrix.
-		 const float* vm = renderState.getViewMatrix();
-		 glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4], vm[5], vm[6], vm[7], vm[8], vm[9], vm[10],
-		 vm[11], vm[12], vm[13], vm[14], vm[15]);
-
-		 //bsg::bsgUtils::printMat("view", viewMatrix);
-		 _scene.draw(viewMatrix, projMatrix);
-
-		 // We let MinVR swap the graphics buffers.
-		 // glutSwapBuffers();*/
 
 	}
 

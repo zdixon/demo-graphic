@@ -59,6 +59,8 @@ public:
 	// get the size of value
 	int getSize();
 
+	int getNonRepSize();
+
 	// get the operator
 	std::string getOperator();
 
@@ -91,6 +93,8 @@ public:
 
 	// sort
 	void sort();
+
+	void clean();
 
 protected:
 	std::string _name;

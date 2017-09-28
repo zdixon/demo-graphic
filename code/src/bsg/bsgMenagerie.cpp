@@ -428,6 +428,8 @@ namespace bsg {
 	  case 'r':
 		  _right->setTexture(width, height, image);
 		  break;
+	  case 'a':
+		  ((drawableObj *) this)->setTexture(width, height, image);
 
 	  default:
 		  _front->setTexture(width, height, image);
