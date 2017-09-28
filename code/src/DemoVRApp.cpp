@@ -163,12 +163,9 @@ void DemoVRApp::setExamples(vector<Dimension<string> > & dims, Array3D & arr) {
 			}
 		}
 	}
-//	 int values = 0;
-//	  for(arrIndex i = 0; i != 3; ++i)
-//	    for(arrIndex j = 0; j != 4; ++j)
-//	      for(arrIndex k = 0; k != 2; ++k)
-//	        arr[i][j][k] = values++;
 }
+
+
 void DemoVRApp::updateStage() {
 	vector<Dimension<string> > dims;
 	Array3D arr;
@@ -236,9 +233,8 @@ void DemoVRApp::processKeys(unsigned char key) {
 
 
 void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
-	
 	int numDims = dims.size();
-	std::cout << "dataToCubes. numDims " << numDims << std::endl;
+	std::cout << "in dataToCubes. numDims " << numDims << std::endl;
 	switch (numDims)
 	{
 	case 1:
@@ -246,12 +242,11 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	case 2:
 		break;
 	default:
-		int xSize = dims[0].getSize();
-		int ySize = dims[1].getSize();
-		int zSize = dims[2].getSize();
+		int xSize = dims[0].getNonRepSize();
+		int ySize = dims[1].getNonRepSize();
+		int zSize = dims[2].getNonRepSize();
 
 		std::cout << "xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
-
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
 		float cubeScale = 5.0 / maxSize;
 		float xPos = 0.0;
@@ -261,9 +256,9 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
-					std::cout << "Adding Cube" << std::endl;
+					std::cout << "Adding Cube";
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
-						glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+						glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
 					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
 					std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
@@ -320,7 +315,7 @@ void DemoVRApp::_checkContext() {
 	}
 
 // This is the background color of the viewport.
-	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 // Now we're ready to start issuing OpenGL calls.  Start by enabling
 // the modes we want.  The DEPTH_TEST is how you get hidden faces.
@@ -354,7 +349,7 @@ void DemoVRApp::_initializeScene() {
 
 // Create a list of lights.  If the shader you're using doesn't use
 // lighting, and the shapes don't have textures, this is irrelevant.
-	_lights->addLight(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+	_lights->addLight(glm::vec4(0.0f, 0.0f, -3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
 
 // Create a shader manager and load the light list.
 	_shader->addLights(_lights);
@@ -367,11 +362,6 @@ void DemoVRApp::_initializeScene() {
 // The shaders are loaded, now compile them.
 	_shader->compileShaders();
 
-	_cube = new bsg::drawableCube(_shader, 10, glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
-	_cube->setScale(2.0f);
-
-	_rectangle = new bsg::drawableRectangle(_shader, 9.0f, 9.0f, 2);
-
 	// Now add our rectangle to the scene.
 	//_scene.addObject(_rectangle);
 	//_scene.addObject(_cube);
@@ -380,7 +370,7 @@ void DemoVRApp::_initializeScene() {
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
 	_axesShader->compileShaders();
 
-	_axesSet = new bsg::drawableAxes(_axesShader, 100.0f);
+	_axesSet = new bsg::drawableAxes(_axesShader, 10.0f);
 
 	// Now add the axes.
 	_scene.addObject(_axesSet);
@@ -430,8 +420,6 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 
 	if (event.getName() == "KbdEsc_Down") {
 		shutdown();
-	} else if (event.getName() == "FrameStart") {
-		_oscillator = event.getDataAsFloat("ElapsedSeconds");
 	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		if (_stage > 0)
 			_stage--;
@@ -475,22 +463,6 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 	if (isRunning()) {
 		// If you want to adjust the positions of the various objects in
 		// your scene, you can do that here.
-		glm::vec3 pos = glm::vec3(0, 0, 0);      //_rectangle->getPosition();
-		pos.x = 2.0f * sin(_oscillator);
-		pos.y = 2.0f * cos(_oscillator);
-		pos.z = -4.0f;
-		_rectangle->setPosition(pos);
-
-		// Move the cube forward and have it circle counterclockwise
-		pos.z = 0.0f;
-		float temp = pos.x;
-		pos.x = pos.y;
-		pos.y = temp;
-		_cube->setPosition(pos);
-		_cube->setScale(1.0);
-
-		_cube->setRotation(glm::vec3(cos(_oscillator), cos(_oscillator) * M_PI, 0.0f));
-		// Now the preliminaries are done, on to the actual drawing.
 
 		// First clear the display.
 		glClear(

@@ -44,6 +44,10 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 		stage6(dims);
 		break;
 	}
+
+//	for(auto d : dims){
+//		d.print();
+//	}
 	computeValueArray(dims, arr);
 }
 
@@ -58,10 +62,6 @@ void StageController::stage0(vector<Dimension<string> > & dims) {
 			"ORDER BY 'Time';";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
-	for (Dimension<string> v : dims) {
-		v.print();
-	}
-
 }
 void StageController::stage1(vector<Dimension<string> > & dims) {
 	string sql =
@@ -175,13 +175,14 @@ void StageController::stage8(vector<Dimension<string> > & dims) {
 }
 
 void StageController::computeValueArray(vector<Dimension<string> > & dims, Array3D & arr) {
-	cout << "computeValueArray" << endl;
+	cout << "in computeValueArray" << endl;
 	Dimension<string> values;
 	vector<Dimension<string> > dimsRefined;
+
 	for (int i = 0; i < 4; i++) {
-		if (i < (dims.size() - 1) && dims[i].getName() != "Value") {
+		if (i < dims.size() && dims[i].getName().compare("Value") != 0) {
 			dimsRefined.push_back(dims[i]);
-		} else if (i < (dims.size() - 1) && dims[i].getName() == "Value") {
+		} else if (i < dims.size() && dims[i].getName().compare("Value") == 0){
 			values = dims[i];
 		} else {
 			Dimension<string> s("Space Holder", "BIG BROTHER IS WATCHING YOU");
@@ -210,10 +211,10 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 				} else {
 					arr[xi][yi][zi] = -1;
 				}
+
 			}
 		}
 	}
-
 	/*
 	 * double check the values in array
 	 */
@@ -227,4 +228,5 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 
 	}
 	dims = dimsRefined;
+	cout << "out computeValueArray" << endl;
 }
