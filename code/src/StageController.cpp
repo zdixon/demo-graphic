@@ -178,9 +178,9 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 	Dimension<string> values;
 	vector<Dimension<string> > dimsRefined;
 	for (int i = 0; i < 4; i++) {
-		if (i < dims.size() - 1 && dims[i].getName() != "Value") {
+		if (i < (dims.size() - 1) && dims[i].getName() != "Value") {
 			dimsRefined.push_back(dims[i]);
-		} else if (dims[i].getName() == "Value") {
+		} else if (i < (dims.size() - 1) && dims[i].getName() == "Value") {
 			values = dims[i];
 		} else {
 			Dimension<string> s("Space Holder", "BIG BROTHER IS WATCHING YOU");
