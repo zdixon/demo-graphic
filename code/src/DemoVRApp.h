@@ -75,6 +75,7 @@ private:
 	void _showCameraPosition();
 
 	void _initializeScene();
+	void updateCubes();
 	void processKeys(unsigned char key);
 
 public:

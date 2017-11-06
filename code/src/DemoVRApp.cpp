@@ -1,10 +1,17 @@
 #include "DemoVRApp.h"
 #include "ds/Dimension.h"
 #include "StageController.h"
+#include "dfr.h"
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <ft2build.h>
+
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+#include "stb_image_write.h"
 
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -14,6 +21,18 @@
 
 /* origin is the upper left corner */
 unsigned char image[HEIGHT][WIDTH];
+unsigned char imgdata[HEIGHT * WIDTH * 4];
+
+bsg::drawableObjModel* _viveController;
+bsg::drawableObjModel* _viveController2;
+
+
+bool hmd = false;
+float maxCubeScale = 5.0;
+glm::vec3 initialPoint = glm::vec3(0.0, 0.0, 0.0);
+glm::vec3 positionOffset = glm::vec3(0.0, 0.0, 0.0);
+bool dragging = false;
+glm::vec3 translationStart;
 
 void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 	FT_Int i, j, p, q;
@@ -54,72 +73,88 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 
 void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 		int fontSize, char side, bsg::drawableCube *cube) {
-	FT_Library library;
-	FT_Face face;
 
-	FT_GlyphSlot slot;
-	FT_Matrix matrix; /* transformation matrix */
-	FT_Vector pen; /* untransformed origin  */
-	FT_Error error;
+	memset(imgdata, 0, WIDTH * HEIGHT * 4);
 
-	double angle;
-	int target_height;
-	int n, num_chars;
+	dfr::drawText(
+		text, 				// Text
+		{ imgdata, WIDTH, HEIGHT }, 	// Ouput image
+		{ filename, fontSize }, // Font and point size
+		{ true, dfr::ALIGN_TOP_LEFT, 1, false }, // Formatting
+		{ 0, 0, 0 }); // Color
 
-	target_height = HEIGHT;
-
-	num_chars = strlen(text);
-	angle = 0.0; // (25.0 / 360) * 3.14159 * 2;      /* use 25 degrees     */
-
-	error = FT_Init_FreeType(&library); /* initialize library */
-	/* error handling omitted */
-
-	error = FT_New_Face(library, filename, 0, &face);/* create face object */
-	/* error handling omitted */
-
-	/* use 50pt at 100dpi */
-	error = FT_Set_Char_Size(face, fontSize * 64, 0, 100, 0); /* set character size */
-	/* error handling omitted */
-
-	slot = face->glyph;
-
-	/* set up matrix */
-	matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
-	matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
-	matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
-	matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
-
-	/* the pen position in 26.6 cartesian space coordinates; */
-	// start at (300,200) relative to the upper left corner
-	pen.x = 0 * 64;
-	pen.y = (target_height - fontSize) * 64;
-
-	for (n = 0; n < num_chars; n++) {
-		/* set transformation */
-		FT_Set_Transform(face, &matrix, &pen);
-
-		/* load glyph image into the slot (erase previous one) */
-		error = FT_Load_Char(face, text[n], FT_LOAD_RENDER);
-		if (error)
-			continue; /* ignore errors */
-
-		/* now, draw to our target surface (convert position) */
-		draw_bitmap(&slot->bitmap, slot->bitmap_left, target_height - slot->bitmap_top);
-
-		/* increment pen position */
-		pen.x += slot->advance.x;
-		pen.y += slot->advance.y;
-	}
-
-	//show_image();
-
-	FT_Done_Face(face);
-	FT_Done_FreeType(library);
+	//stbi_write_png("image.png", WIDTH, HEIGHT, 4, imgdata, WIDTH * 4);
 
 	glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
+	cube->setTexture(WIDTH, HEIGHT, (unsigned char *)&imgdata, side);
+	memset(imgdata, 0, sizeof imgdata);
+	//FT_Library library;
+	//FT_Face face;
 
-	cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
-	memset(image, 0, sizeof image);
+	//FT_GlyphSlot slot;
+	//FT_Matrix matrix; /* transformation matrix */
+	//FT_Vector pen; /* untransformed origin  */
+	//FT_Error error;
+
+	//double angle;
+	//int target_height;
+	//int n, num_chars;
+
+	//target_height = HEIGHT;
+
+	//num_chars = strlen(text);
+	//angle = 0.0; // (25.0 / 360) * 3.14159 * 2;      /* use 25 degrees     */
+
+	//error = FT_Init_FreeType(&library); /* initialize library */
+	///* error handling omitted */
+
+	//error = FT_New_Face(library, filename, 0, &face);/* create face object */
+	///* error handling omitted */
+
+	///* use 50pt at 100dpi */
+	//error = FT_Set_Char_Size(face, fontSize * 64, 0, 100, 0); /* set character size */
+	///* error handling omitted */
+
+	//slot = face->glyph;
+
+	///* set up matrix */
+	//matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
+	//matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
+	//matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
+	//matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
+
+	///* the pen position in 26.6 cartesian space coordinates; */
+	//// start at (300,200) relative to the upper left corner
+	//pen.x = 0 * 64;
+	//pen.y = (target_height - fontSize) * 64;
+
+	//for (n = 0; n < num_chars; n++) {
+	//	/* set transformation */
+	//	FT_Set_Transform(face, &matrix, &pen);
+
+	//	/* load glyph image into the slot (erase previous one) */
+	//	error = FT_Load_Char(face, text[n], FT_LOAD_RENDER);
+	//	if (error)
+	//		continue; /* ignore errors */
+
+	//	/* now, draw to our target surface (convert position) */
+	//	draw_bitmap(&slot->bitmap, slot->bitmap_left, target_height - slot->bitmap_top);
+
+	//	/* increment pen position */
+	//	pen.x += slot->advance.x;
+	//	pen.y += slot->advance.y;
+	//}
+
+	////show_image();
+
+	//FT_Done_Face(face);
+	//FT_Done_FreeType(library);
+
+	//glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
+
+	//cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
+	//memset(image, 0, sizeof image);
+	
 
 	//glGenTextures(1, &texture);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, slot->bitmap.width, slot->bitmap.rows, 0,
@@ -171,6 +206,7 @@ void DemoVRApp::updateStage() {
 	Array3D arr;
 	setExamples(dims, arr);
 	_controller.setUpDimsArr(dims, arr, _stage);
+	cubes.clear();
 	dataToCubes(dims, arr);
 }
 
@@ -248,26 +284,26 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 
 		std::cout << "xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
-		float cubeScale = 5.0 / maxSize;
-		float xPos = 0.0;
-		float yPos = 0.0;
-		float zPos = 0.0;
+		float cubeScale = maxCubeScale / maxSize;
+		float xPos = initialPoint.x;
+		float yPos = initialPoint.y;
+		float zPos = initialPoint.z;
 		float step = cubeScale * 1.1;
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
 					std::cout << "Adding Cube";
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
-						glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
+						glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
 					std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
 					char_array.push_back(0);
 
 					ft_drawString("../fonts/times.ttf", &char_array[0],
-						glm::vec3(1.0, 1.0, 1.0), 100, cube);
+						glm::vec3(1.0, 0.0, 0.0), 100, cube);
 					cube->setScale(cubeScale);
-					cube->setPosition(glm::vec3(xPos + (x * step), yPos - (y * step), zPos + (z * step)));
+					cube->setPosition(glm::vec3(xPos + (x * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
 					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << ", z: " << z << "/" << zSize << std::endl;
 					//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
 					cubes.insert(cube);
@@ -381,8 +417,16 @@ void DemoVRApp::_initializeScene() {
 			std::cout << "added cube" << std::endl;
 			_scene.addObject(cb);
 		}
-		cubes.clear();
 	}
+
+	_viveController = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
+	_viveController->setScale(0.5f);
+
+	_viveController2 = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
+	_viveController2->setScale(0.5f);
+
+	_scene.addObject(_viveController);
+	_scene.addObject(_viveController2);
 
 
 	// Some fonts cause segfaults for no good reason on some platforms (Mac). For example, '2', '3', and '5' in 
@@ -409,6 +453,13 @@ void DemoVRApp::_initializeScene() {
 // so far so good
 }
 
+void DemoVRApp::updateCubes() {
+	for (auto cube : cubes) {
+		cube->setPosition(cube->getPosition() + positionOffset);
+	}
+
+}
+
 /// The MinVR apparatus invokes this method whenever there is a new
 /// event to process.
 void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
@@ -416,17 +467,75 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 	float step = 0.5f;
 	float stepAngle = 5.0f / 360.0f;
 
-// Quit if the escape button is pressed
+	// Quit if the escape button is pressed
 
-	if (event.getName() == "KbdEsc_Down") {
+	if (event.getName() != "HTC_HMD_1" && event.getName() != "HTC_TrackingReference_1" && event.getName() != "HTC_TrackingReference_2" && event.getName() != "HTC_Controller_Right" && event.getName() != "HTC_Controller_Left" && event.getName() != "FrameStart") {
+		std::cout << event.getName() << std::endl;
+	}
+	if (event.getName() == "HTC_HMD_1") {
+		if (!hmd) {
+			hmd = true;
+			maxCubeScale = 1.0;
+			initialPoint.y = 1.0;
+			initialPoint.x = -0.5;
+		}
+	} else if (event.getName() == "HTC_Controller_Right_Axis1Button_Pressed" || event.getName() == "HTC_Controller_1_Axis1Button_Pressed") {
+		std::vector<std::string> fields = event.getDataFields();
+		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
+		{
+			glm::mat4x4 pose = glm::make_mat4(event.getDataAsFloatArray("Pose"));
+			glm::vec3 position = glm::vec3(pose[3]);
+			translationStart = position;
+			dragging = true;
+		}
+	} else if (event.getName() == "HTC_Controller_Right_Axis1Button_Released" || event.getName() == "HTC_Controller_1_Axis1Button_Released") {
+		std::vector<std::string> fields = event.getDataFields();
+		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
+		{
+			glm::mat4x4 pose = glm::make_mat4(event.getDataAsFloatArray("Pose"));
+			glm::vec3 position = glm::vec3(pose[3]);
+			positionOffset = position - translationStart;
+			dragging = false;
+			updateCubes();
+		}
+	} else if (event.getName() == "KbdEsc_Down") {
 		shutdown();
-	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down" || event.getName() == "HTC_Controller_Left_Axis0Button_Pressed" || event.getName() == "HTC_Controller_0_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		if (_stage > 0)
 			_stage--;
 		updateStage();
-	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down" || event.getName() == "HTC_Controller_Right_Axis0Button_Pressed" || event.getName() == "HTC_Controller_1_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
 		updateStage();
+	}
+	else if (event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_Left") {
+		std::vector<std::string> fields = event.getDataFields();
+		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
+		{
+			glm::mat4x4 pose = glm::make_mat4(event.getDataAsFloatArray("Pose"));
+			_viveController->setModelMatrix(pose);
+			
+		}
+
+	}
+	else if (event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Right") {
+		std::vector<std::string> fields = event.getDataFields();
+		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
+		{
+			glm::mat4x4 pose = glm::make_mat4(event.getDataAsFloatArray("Pose"));
+			_viveController2->setModelMatrix(pose);
+			if (dragging) {
+				glm::vec3 position = glm::vec3(pose[3]);
+				positionOffset = position - translationStart;
+				updateCubes();
+				translationStart = position;
+			}
+		}
+
+
+		// Print out where you are (where the camera is) and where you're
+		// looking.
+		// _showCameraPosition();
 	}
 	else if (event.getName().length() > 4 && event.getName().substr(0, 3) == "Kbd") {
 		std::cout << event.getName() << std::endl;
@@ -446,6 +555,7 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 	if (renderState.isInitialRenderCall()) {
 		_checkContext();
 		_initializeScene();
+		dfr::init();
 		// exit(0);
 		_scene.prepare();
 	}
@@ -482,7 +592,13 @@ void DemoVRApp::onVRRenderGraphics(const MinVR::VRGraphicsState &renderState) {
 		glm::mat4 viewMatrix = glm::mat4(vm[0], vm[1], vm[2], vm[3], vm[4], vm[5], vm[6], vm[7], vm[8], vm[9], vm[10],
 				vm[11], vm[12], vm[13], vm[14], vm[15]);
 
-		_scene.draw(_scene.getViewMatrix(), _scene.getProjMatrix());
+		if (hmd) {
+			_scene.draw(viewMatrix, projMatrix);
+		}
+		else {
+			_scene.draw(_scene.getViewMatrix(), _scene.getProjMatrix());
+		}
+
 
 		//bsg::bsgUtils::printMat("view", viewMatrix);
 		//bsg::bsgUtils::printMat("proj", projMatrix);

@@ -801,9 +801,8 @@ void drawableObj::setTexture(int width, int height, unsigned char image[]) {
 	int random = rand();
 	//stbi_write_png((std::to_string(random) + std::string("outtestbefore.png")).c_str(), 512, 512, 1, &image[0], 512);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, &image[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
 	char test[512][512];
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, &test[0]);
 	//stbi_write_png((std::to_string(random) + std::string("outtest.png")).c_str(), 512, 512, 1, test, 512);
 
 }

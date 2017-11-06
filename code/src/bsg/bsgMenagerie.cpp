@@ -357,8 +357,8 @@ namespace bsg {
           normals.push_back(normal);
           normals.push_back(normal);
           
-          uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, 1.0f - static_cast<float>(i)/tesselation));
-          uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, 1.0f - static_cast<float>(i + 1)/tesselation));
+          uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, static_cast<float>(i)/tesselation));
+          uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, static_cast<float>(i + 1)/tesselation));
           
           colors.push_back(color);
           colors.push_back(color);

@@ -315,4 +315,9 @@ std::vector<std::string> drawableObjModel::split(const std::string line,
   }
   return out;
 }
+
+void drawableObjModel::setModelMatrix(glm::mat4x4 &model) {
+	this->_modelMatrix = model;
+}
+
 }

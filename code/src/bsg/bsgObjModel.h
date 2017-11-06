@@ -27,6 +27,7 @@ public:
   drawableObjModel(bsgPtr<shaderMgr> pShader,
                    const std::string &fileName,
                    const bool &back);
+  void setModelMatrix(glm::mat4x4 &model);
 
 };
 

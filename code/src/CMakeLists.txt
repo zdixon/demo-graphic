@@ -14,7 +14,7 @@
   )
   
     # add_executable(main  textureDemoMinVR.cpp)
-    add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp StageController.cpp StageController.h)
+    add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp StageController.cpp StageController.h dfr.h dfr.cpp)
     # add_executable(main main.cpp DemoVRApp.h DemoVRApp.cpp)
 
 
