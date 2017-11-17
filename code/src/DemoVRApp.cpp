@@ -294,7 +294,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 				for (int z = 0; z < zSize; z++) {
 					std::cout << "Adding Cube";
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
-						glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
 					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
 					std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
@@ -385,7 +385,7 @@ void DemoVRApp::_initializeScene() {
 
 // Create a list of lights.  If the shader you're using doesn't use
 // lighting, and the shapes don't have textures, this is irrelevant.
-	_lights->addLight(glm::vec4(0.0f, 0.0f, -3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 0.0f));
+	_lights->addLight(glm::vec4(0.0f, 0.0f, -3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 // Create a shader manager and load the light list.
 	_shader->addLights(_lights);
@@ -469,7 +469,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 
 	// Quit if the escape button is pressed
 
-	if (event.getName() != "HTC_HMD_1" && event.getName() != "HTC_TrackingReference_1" && event.getName() != "HTC_TrackingReference_2" && event.getName() != "HTC_Controller_Right" && event.getName() != "HTC_Controller_Left" && event.getName() != "FrameStart") {
+	if (event.getName() != "HTC_HMD_1" && event.getName() != "HTC_TrackingReference_1" && event.getName() != "HTC_TrackingReference_2" && event.getName() != "HTC_Controller_1" && event.getName() != "HTC_Controller_2" && event.getName() != "HTC_Controller_Right" && event.getName() != "HTC_Controller_Left" && event.getName() != "FrameStart") {
 		std::cout << event.getName() << std::endl;
 	}
 	if (event.getName() == "HTC_HMD_1") {
@@ -506,6 +506,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		updateStage();
 	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down" || event.getName() == "HTC_Controller_Right_Axis0Button_Pressed" || event.getName() == "HTC_Controller_1_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
+		std::cout << _stage << std::endl;
 		updateStage();
 	}
 	else if (event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_Left") {
