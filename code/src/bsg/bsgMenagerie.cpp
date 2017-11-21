@@ -346,22 +346,43 @@ namespace bsg {
       glm::normalize(normal);
 
       for (int i = 0; i < tesselation; ++i) {
-        for (int j = 0; j <= tesselation; ++j) {
+        for (int j = 0; j < tesselation; ++j) {
           // current vertex
           glm::vec3 currPos = topLeft + ((float) i * vertical) + ((float) j * horizontal);
           // next vertex, directly below current. GL_TRIANGLE_STRIP will fill in the / in the |/|/.../| pattern.
           glm::vec3 v = currPos + vertical;
           verts.push_back(glm::vec4(currPos, 1.0f));
           verts.push_back(glm::vec4(v, 1.0f));
+		  verts.push_back(glm::vec4(currPos + horizontal, 1.0f));
+		  verts.push_back(glm::vec4(currPos + horizontal, 1.0f));
+		  verts.push_back(glm::vec4(v, 1.0f));
+		  verts.push_back(glm::vec4(currPos + horizontal + vertical, 1.0f));
+
 
           normals.push_back(normal);
           normals.push_back(normal);
+		  normals.push_back(normal);
+		  normals.push_back(normal);
+		  normals.push_back(normal);
+		  normals.push_back(normal);
           
           uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, static_cast<float>(i)/tesselation));
           uvs.push_back(glm::vec2(static_cast<float>(j)/tesselation, static_cast<float>(i + 1)/tesselation));
+		  uvs.push_back(glm::vec2(static_cast<float>(j + 1) / tesselation, static_cast<float>(i) / tesselation));
+
+		  uvs.push_back(glm::vec2(static_cast<float>(j + 1) / tesselation, static_cast<float>(i) / tesselation));
+		  uvs.push_back(glm::vec2(static_cast<float>(j) / tesselation, static_cast<float>(i + 1) / tesselation));
+		  uvs.push_back(glm::vec2(static_cast<float>(j + 1) / tesselation, static_cast<float>(i + 1) / tesselation));
+
+
           
           colors.push_back(color);
           colors.push_back(color);
+		  colors.push_back(color);
+		  colors.push_back(color);
+		  colors.push_back(color);
+		  colors.push_back(color);
+
         }
       }
 
@@ -375,7 +396,7 @@ namespace bsg {
       rect->addData(bsg::GLDATA_TEXCOORDS, "texture", uvs);
     
       // The vertices above are arranged into a set of triangles.
-      rect->setDrawType(GL_TRIANGLE_STRIP, verts.size());
+      rect->setDrawType(GL_TRIANGLES, verts.size());
     }
 
   

@@ -1034,6 +1034,14 @@ void drawableCompound::load() {
   }
 }
 
+void drawableCompound::setTexture(int width, int height, unsigned char image[]) {
+	std::vector<bsg::bsgPtr<bsg::drawableObj>> objs{std::begin(_objects), std::end(_objects)};
+	for (int i = 0; i < objs.size(); i++)
+	{
+		objs[i]->setTexture(width, height, image);
+	}
+}
+
 void drawableCompound::draw(const glm::mat4& viewMatrix,
                             const glm::mat4& projMatrix) {
 

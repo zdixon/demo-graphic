@@ -1135,6 +1135,7 @@ class drawableCompound : public drawableMulti {
   /// made, and multiplying it by the input matrix.
   void load();
 
+  void setTexture(int width, int height, unsigned char image[]);
   /// \brief Draws an object.
   ///
   /// Just executes draw() using the given view and projection matrices.

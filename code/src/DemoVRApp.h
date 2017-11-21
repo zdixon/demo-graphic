@@ -34,6 +34,7 @@ private:
   	bsg::drawableRectangle* _rectangle;
 
 	std::set<bsg::drawableCube *> cubes;
+	std::set<bsg::drawableSquare *> labels;
 
 	// These are part of the animation stuff, and again are out here with
 	// the big boy global variables so they can be available to both the
@@ -81,6 +82,8 @@ private:
 public:
 	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side, bsg::drawableCube *cube);
 	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, bsg::drawableCube *cube);
+	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, bsg::drawableSquare *square);
+	void ft_generateText(char * filename, char * text, glm::vec3 color, int fontSize, bool center);
 
 	DemoVRApp(int argc, char** argv);
 

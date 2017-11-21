@@ -19,7 +19,8 @@ StageController::~StageController() {
 }
 
 void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & arr, int stage) {
-	stage = stage % 7;
+	stage = (stage + 7) % 7;
+	std::cout << stage << std::endl;
 
 	switch (stage) {
 	case 0:
@@ -141,20 +142,21 @@ void StageController::stage5(vector<Dimension<string> > & dims) {
 
 void StageController::stage6(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
-			"BRANCH_REGION_X as 'Region',"
-			"IN_RADIUS_BRANCH_NM as 'Region_Branch',"
-			"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time',"
-			"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
-			"KPI_BUSINESS_NM as 'Business',"
-			"KPI_CATEGORY_COARSE_X as 'Money_Category' "
-			"FROM BDC_TXN_FACT_MA_MORE base,"
-			"BDC_KPI_DIM_MORE kpi,"
-			"BDC_HOUSEHOLD_DEMOG demog "
-			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
-			"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
-			"AND KPI_BUSINESS_NM = 'New_money' "
-			"AND KPI_CATEGORY_COARSE_X ='Retirement' "
-			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), BRANCH_REGION_X, IN_RADIUS_BRANCH_NM;";
+		"BRANCH_REGION_X as 'Region',"
+		//"IN_RADIUS_BRANCH_NM as 'Region_Branch',"
+		"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time',"
+		"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
+		"KPI_CATEGORY_COARSE_X as 'Money_Category', "
+		"KPI_BUSINESS_NM as 'Business'"
+		"FROM BDC_TXN_FACT_MA_MORE base,"
+		"BDC_KPI_DIM_MORE kpi,"
+		"BDC_HOUSEHOLD_DEMOG demog "
+		"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+		"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
+		"AND KPI_BUSINESS_NM = 'New_money' "
+		//"AND KPI_CATEGORY_COARSE_X ='Retirement' "
+		//"AND SNAPSHOT_D >= '2014-01-01' AND SNAPSHOT_D <= '2016-12-31' "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), BRANCH_REGION_X, KPI_CATEGORY_COARSE_X;"; // , IN_RADIUS_BRANCH_NM; ";
 
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
@@ -201,13 +203,31 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 		for (int yi = 0; yi < Y; yi++) {
 			for (int zi = 0; zi < Z; zi++) {
 				if (Y == 1 && Z == 1 && yi == 0 && zi == 0) {
-					arr[xi][yi][zi] = atof(values.getValueAt(index).c_str());
+					boost::optional<std::string> str = values.getValueAt(index);
+					if (str) {
+						arr[xi][yi][zi] = atof(str.get().c_str());
+					}
+					else {
+						arr[xi][yi][zi] = -1;
+					}
 					index++;
 				} else if (Y != 1 && Z == 1 && zi == 0) {
-					arr[xi][yi][zi] = atof(values.getValueAt(index).c_str());
+					boost::optional<std::string> str = values.getValueAt(index);
+					if (str) {
+						arr[xi][yi][zi] = atof(str.get().c_str());
+					}
+					else {
+						arr[xi][yi][zi] = -1;
+					}
 					index++;
 				} else if (Y != 1 && Z != 1) {
-					arr[xi][yi][zi] = atof(values.getValueAt(index).c_str());
+					boost::optional<std::string> str = values.getValueAt(index);
+					if (str) {
+						arr[xi][yi][zi] = atof(str.get().c_str());
+					}
+					else {
+						arr[xi][yi][zi] = -1;
+					}
 					index++;
 				} else {
 					arr[xi][yi][zi] = -1;

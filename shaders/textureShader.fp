@@ -26,8 +26,11 @@ void main() {
   //0.6 * vec4(1.0, 1.0, 1.0, 1.0);
   float ambientCoefficient = 0.3;
   vec4 materialSpecularColor = 0.5 * vec4(1.0, 1.0, 1.0, 0.0);
-
-  vec4 color = 0.05 * colorFrag;
+  
+  vec4 alpha = materialColor.aaaa;
+  vec4 color = (1.0 - alpha) * colorFrag;
+  color += materialColor;
+  vec4 tempColor = color;
   //vec4 color = vec4(0,0,0,0);
   
   // The lighting effects are additive, so we run through the lights,
@@ -35,7 +38,7 @@ void main() {
   for (int i = 0; i < NUM_LIGHTS; i++) {
 
     // Ambient : simulates indirect lighting
-    vec4 ambient = ambientCoefficient * lightColor[i] * materialColor;
+    vec4 ambient = ambientCoefficient * lightColor[i] * colorFrag;
     
     // Distance to the light
     float distanceToLight = length(lightPositionWS[i] - positionWS);
@@ -48,7 +51,7 @@ void main() {
     float cosAngleFromNormal = max(0.0, dot(normalCS, lightDirectionCS[i]));
 
     // Diffuse : "color" of the object
-    vec4 diffuse = materialColor * lightColor[i] * cosAngleFromNormal;
+    vec4 diffuse = tempColor * lightColor[i] * cosAngleFromNormal;
     
     // Direction in which the triangle reflects the light
     vec4 reflectDir = reflect(-lightDirectionCS[i], normalCS);
@@ -65,9 +68,9 @@ void main() {
     float attenuation = 1.0 / (1.0 + 0.01 * pow(distanceToLight, 2));
     //attenuation = 1.0;
     
-    color += ambient + attenuation * (diffuse + 0.0 * specular);
+    color += ambient + attenuation * (diffuse + 0.2 * specular);
   }
-  
+
   gl_FragColor = color; // normalize(normalCS) ;//+ materialColor;
 
 }

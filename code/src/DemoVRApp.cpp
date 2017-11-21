@@ -31,8 +31,10 @@ bool hmd = false;
 float maxCubeScale = 5.0;
 glm::vec3 initialPoint = glm::vec3(0.0, 0.0, 0.0);
 glm::vec3 positionOffset = glm::vec3(0.0, 0.0, 0.0);
+glm::vec3 rotationOffset = glm::vec3(0.0, 0.0, 0.0);
 bool dragging = false;
 glm::vec3 translationStart;
+glm::vec3 rotationStart;
 
 void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 	FT_Int i, j, p, q;
@@ -71,21 +73,37 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	ft_drawString(filename, text, color, fontSize, 'a', cube);
 }
 
-void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
-		int fontSize, char side, bsg::drawableCube *cube) {
-
+void DemoVRApp::ft_generateText(char * filename, char * text, glm::vec3 color, int fontSize, bool center) {
 	memset(imgdata, 0, WIDTH * HEIGHT * 4);
-
+	unsigned char red = color.r * 255;
+	unsigned char green = color.g * 255;
+	unsigned char blue = color.b * 255;
+	int align = dfr::ALIGN_TOP_LEFT;
+	if (center) {
+		align = dfr::ALIGN_TOP;
+	}
 	dfr::drawText(
 		text, 				// Text
 		{ imgdata, WIDTH, HEIGHT }, 	// Ouput image
 		{ filename, fontSize }, // Font and point size
-		{ true, dfr::ALIGN_TOP_LEFT, 1, false }, // Formatting
-		{ 0, 0, 0 }); // Color
+		{ true, (dfr::eAlign) align, 1, false }, // Formatting
+		{ red, green, blue}); // Color
 
-	//stbi_write_png("image.png", WIDTH, HEIGHT, 4, imgdata, WIDTH * 4);
+	stbi_write_png("image.png", WIDTH, HEIGHT, 4, imgdata, WIDTH * 4);
 
 	glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
+}
+
+void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
+	int fontSize, bsg::drawableSquare *square) {
+	ft_generateText(filename, text, color, fontSize, true);
+	square->setTexture(WIDTH, HEIGHT, (unsigned char *)&imgdata);
+	memset(imgdata, 0, sizeof imgdata);
+}
+
+void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
+		int fontSize, char side, bsg::drawableCube *cube) {
+	ft_generateText(filename, text, color, fontSize, false);
 	cube->setTexture(WIDTH, HEIGHT, (unsigned char *)&imgdata, side);
 	memset(imgdata, 0, sizeof imgdata);
 	//FT_Library library;
@@ -207,6 +225,7 @@ void DemoVRApp::updateStage() {
 	setExamples(dims, arr);
 	_controller.setUpDimsArr(dims, arr, _stage);
 	cubes.clear();
+	labels.clear();
 	dataToCubes(dims, arr);
 }
 
@@ -278,10 +297,16 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	case 2:
 		break;
 	default:
+		for (int x = 0; x < dims.size(); x++) {
+			std::cout << dims[x].getName() << std::endl;
+			dims[x].printValues();
+		}
 		int xSize = dims[0].getNonRepSize();
 		int ySize = dims[1].getNonRepSize();
 		int zSize = dims[2].getNonRepSize();
-
+		bool xDim = dims[0].getName() != "Space Holder";
+		bool yDim = dims[1].getName() != "Space Holder";
+		bool zDim = dims[2].getName() != "Space Holder";
 		std::cout << "xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
 		float cubeScale = maxCubeScale / maxSize;
@@ -292,25 +317,164 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
-					std::cout << "Adding Cube";
+					//std::cout << "Adding Cube";
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
-					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
+					std::string dbl = boost::lexical_cast<std::string>(arr[y][x][z]);
+					//if (xDim && yDim && zDim) {
+					//	dbl = dbl + dims[0].getValueAt(y + x * ySize + z * ySize * xSize) + dims[1].getValueAt(y + x * ySize + z * ySize * xSize) + dims[2].getValueAt(y + x * ySize + z * ySize * xSize);
+					//}
 					std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
 					char_array.push_back(0);
 
 					ft_drawString("../fonts/times.ttf", &char_array[0],
-						glm::vec3(1.0, 0.0, 0.0), 100, cube);
+						glm::vec3(0.0, 0.0, 0.0), 100, cube);
 					cube->setScale(cubeScale);
 					cube->setPosition(glm::vec3(xPos + (x * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
-					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << ", z: " << z << "/" << zSize << std::endl;
+					cube->setRotation(cube->getPitchYawRoll() + rotationOffset);
 					//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
 					cubes.insert(cube);
 
-					std::cout << "Added cube" << std::endl;
+					//std::cout << "Added cube" << std::endl;
+					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+
 				}
 			}
+		}
+
+		std::vector<std::string> xLabels;
+		std::set<std::string> knownX;
+		std::vector<std::string> yLabels;
+		std::set<std::string> knownY;
+		std::vector<std::string> zLabels;
+		std::set<std::string> knownZ;
+		for (int x = 0; x < dims[0].getSize(); x++) {
+			boost::optional<std::string> strop = dims[0].getValueAt(x);
+			std::string str;
+			if (strop) {
+				str = strop.get();
+			}
+			else {
+				str = " ";
+			}
+			if (knownX.find(str) == knownX.end()) {
+				xLabels.push_back(str);
+				knownX.insert(str);
+			}
+		}
+		for (int x = 0; x < dims[1].getSize(); x++) {
+			boost::optional<std::string> strop = dims[1].getValueAt(x);
+			std::string str;
+			if (strop) {
+				str = strop.get();
+			}
+			else {
+				str = " ";
+			}
+			if (knownY.find(str) == knownY.end()) {
+				yLabels.push_back(str);
+				knownY.insert(str);
+			}
+		}
+		for (int x = 0; x < dims[2].getSize(); x++) {
+			boost::optional<std::string> strop = dims[2].getValueAt(x);
+			std::string str;
+			if (strop) {
+				str = strop.get();
+			}
+			else {
+				str = " ";
+			}
+			if (knownZ.find(str) == knownZ.end()) {
+				zLabels.push_back(str);
+				knownZ.insert(str);
+			}
+		}
+
+		for (int x = 0; x < xSize; x++) {
+			for (int y = 0; y < ySize; y++) {
+				for (int z = 0; z < zSize; z++) {
+					if (x == 0 && z==(zSize - 1) && yDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + ((x - 1) * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
+						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale);
+						/*boost::optional<std::string> strop = dims[1].getValueAt(x + y * xSize + z * xSize * ySize);
+						std::string str;
+						if (strop) {
+							str = strop.get();
+						}
+						else {
+							str = "";
+						}*/
+						std::string str = yLabels[y];
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.0, 0.0), 100, label);
+						labels.insert(label);
+					}
+					/*else if (x == xSize - 1) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + ((x + 1) * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
+						label->setScale(cubeScale);
+						std::string str = dims[1].getValueAt(y); // y label
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 1.0, 1.0), 100, label);
+						labels.insert(label);
+					}*/
+					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + (x * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
+						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale);
+						/*boost::optional<std::string> strop = dims[0].getValueAt(y + x * ySize + z * ySize * xSize);
+						std::string str;
+						if (strop) {
+							str = strop.get();
+						}
+						else {
+							str = "";
+						}*/
+						std::string str = xLabels[x];
+						if (str == "") {
+							str = " ";
+						}
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 1.0, 0.0), 100, label);
+						labels.insert(label);
+					}
+					
+					if (y == (ySize - 1) && x == 0 && zDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + (x * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
+						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale);
+						/*boost::optional<std::string> strop = dims[2].getValueAt(y + x * ySize + z * ySize * xSize); // z label
+						std::string str;
+						if (strop) {
+							str = strop.get();
+						}
+						else {
+							str = "";
+						}*/
+						std::string str = zLabels[z];
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 0.0, 1.0), 100, label);
+						labels.insert(label);
+					}
+
+				}
+			}
+		}
+		for (int x = 0; x < xSize; x++) {
+
+			int y = ySize;
+			int z = 0;
+			
 		}
 		std::cout << "After added cube..." << std::endl;
 		_scene = bsg::scene();
@@ -365,9 +529,13 @@ void DemoVRApp::_checkContext() {
 
 // This is just a performance enhancement that allows OpenGL to
 // ignore faces that are facing away from the camera.
+	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
+
 	glLineWidth(1);
 	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
@@ -418,6 +586,13 @@ void DemoVRApp::_initializeScene() {
 			_scene.addObject(cb);
 		}
 	}
+	if (labels.size()) {
+		for (bsg::drawableSquare *lb : labels)
+		{
+			std::cout << "added label" << std::endl;
+			_scene.addObject(lb);
+		}
+	}
 
 	_viveController = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
 	_viveController->setScale(0.5f);
@@ -456,6 +631,11 @@ void DemoVRApp::_initializeScene() {
 void DemoVRApp::updateCubes() {
 	for (auto cube : cubes) {
 		cube->setPosition(cube->getPosition() + positionOffset);
+		//cube->setRotation(cube->getPitchYawRoll() + rotationOffset);
+	}
+	for (auto label : labels) {
+		label->setPosition(label->getPosition() + positionOffset);
+		//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 	}
 
 }
@@ -485,7 +665,9 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		{
 			glm::mat4x4 pose = glm::make_mat4(event.getDataAsFloatArray("Pose"));
 			glm::vec3 position = glm::vec3(pose[3]);
+			glm::vec3 rotation = glm::vec3(atan2(pose[1][0], pose[0][0]), atan2(-pose[2][0], sqrt(pose[2][1] * pose[2][1] + pose[2][2] * pose[2][2])), atan2(pose[2][1], pose[2][2]));
 			translationStart = position;
+			rotationStart = rotation;
 			dragging = true;
 		}
 	} else if (event.getName() == "HTC_Controller_Right_Axis1Button_Released" || event.getName() == "HTC_Controller_1_Axis1Button_Released") {
@@ -509,7 +691,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		std::cout << _stage << std::endl;
 		updateStage();
 	}
-	else if (event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_Left") {
+	else if (event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Left") {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{
@@ -519,7 +701,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		}
 
 	}
-	else if (event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Right") {
+	else if (event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_Right") {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{
@@ -527,9 +709,13 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 			_viveController2->setModelMatrix(pose);
 			if (dragging) {
 				glm::vec3 position = glm::vec3(pose[3]);
+				glm::vec3 rotation = glm::vec3(atan2(pose[1][0], pose[0][0]), atan2(-pose[2][0], sqrt(pose[2][1] * pose[2][1] + pose[2][2] * pose[2][2])), atan2(pose[2][1], pose[2][2]));
 				positionOffset = position - translationStart;
+				rotationOffset = rotation - rotationStart;
+				std::cout << rotation.x << " " << rotation.y << " " << rotation.z << std::endl;
 				updateCubes();
 				translationStart = position;
+				rotationStart = rotation;
 			}
 		}
 

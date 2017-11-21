@@ -12,6 +12,7 @@
 #include <string>
 #include <algorithm>
 
+
 /**
  *
  */
@@ -55,9 +56,9 @@ std::string Dimension<T>::getName() {
  *
  */
 template<typename T>
-T Dimension<T>::getValueAt(int i) {
+boost::optional<T> Dimension<T>::getValueAt(int i) {
 	if (_valueVector.size() < i + 1) {
-		throw std::out_of_range("i");
+		return boost::none;
 	}
 	return _valueVector.at(i);
 }
