@@ -106,84 +106,8 @@ void DemoVRApp::ft_drawString(char * filename, char * text, glm::vec3 color,
 	ft_generateText(filename, text, color, fontSize, false);
 	cube->setTexture(WIDTH, HEIGHT, (unsigned char *)&imgdata, side);
 	memset(imgdata, 0, sizeof imgdata);
-	//FT_Library library;
-	//FT_Face face;
-
-	//FT_GlyphSlot slot;
-	//FT_Matrix matrix; /* transformation matrix */
-	//FT_Vector pen; /* untransformed origin  */
-	//FT_Error error;
-
-	//double angle;
-	//int target_height;
-	//int n, num_chars;
-
-	//target_height = HEIGHT;
-
-	//num_chars = strlen(text);
-	//angle = 0.0; // (25.0 / 360) * 3.14159 * 2;      /* use 25 degrees     */
-
-	//error = FT_Init_FreeType(&library); /* initialize library */
-	///* error handling omitted */
-
-	//error = FT_New_Face(library, filename, 0, &face);/* create face object */
-	///* error handling omitted */
-
-	///* use 50pt at 100dpi */
-	//error = FT_Set_Char_Size(face, fontSize * 64, 0, 100, 0); /* set character size */
-	///* error handling omitted */
-
-	//slot = face->glyph;
-
-	///* set up matrix */
-	//matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
-	//matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
-	//matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
-	//matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
-
-	///* the pen position in 26.6 cartesian space coordinates; */
-	//// start at (300,200) relative to the upper left corner
-	//pen.x = 0 * 64;
-	//pen.y = (target_height - fontSize) * 64;
-
-	//for (n = 0; n < num_chars; n++) {
-	//	/* set transformation */
-	//	FT_Set_Transform(face, &matrix, &pen);
-
-	//	/* load glyph image into the slot (erase previous one) */
-	//	error = FT_Load_Char(face, text[n], FT_LOAD_RENDER);
-	//	if (error)
-	//		continue; /* ignore errors */
-
-	//	/* now, draw to our target surface (convert position) */
-	//	draw_bitmap(&slot->bitmap, slot->bitmap_left, target_height - slot->bitmap_top);
-
-	//	/* increment pen position */
-	//	pen.x += slot->advance.x;
-	//	pen.y += slot->advance.y;
-	//}
-
-	////show_image();
-
-	//FT_Done_Face(face);
-	//FT_Done_FreeType(library);
-
-	//glUniform3f(glGetUniformLocation(_shader->getProgram(), "textColor"), color.x, color.y, color.z);
-
-	//cube->setTexture(WIDTH, HEIGHT, (unsigned char *) &image, side);
-	//memset(image, 0, sizeof image);
-	
-
-	//glGenTextures(1, &texture);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, slot->bitmap.width, slot->bitmap.rows, 0,
-	//	GL_ALPHA, GL_UNSIGNED_BYTE, slot->bitmap.buffer);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT,
-	//	0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0,
-	//	GL_ALPHA, GL_UNSIGNED_BYTE, image);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
+
 void DemoVRApp::setExamples(vector<Dimension<string> > & dims, Array3D & arr) {
 	dims = vector<Dimension<string> >();
 	Dimension<string> x = Dimension<string>("Time");
@@ -222,7 +146,6 @@ void DemoVRApp::setExamples(vector<Dimension<string> > & dims, Array3D & arr) {
 void DemoVRApp::updateStage() {
 	vector<Dimension<string> > dims;
 	Array3D arr;
-	setExamples(dims, arr);
 	_controller.setUpDimsArr(dims, arr, _stage);
 	cubes.clear();
 	labels.clear();
@@ -288,7 +211,7 @@ void DemoVRApp::processKeys(unsigned char key) {
 
 void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	int numDims = dims.size();
-	std::cout << "in dataToCubes. numDims " << numDims << std::endl;
+	std::cout << "----in dataToCubes. numDims " << numDims << std::endl;
 	switch (numDims)
 	{
 	case 1:
@@ -296,17 +219,17 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	case 2:
 		break;
 	default:
-		for (int x = 0; x < dims.size(); x++) {
-			std::cout << dims[x].getName() << std::endl;
-			dims[x].printValues();
-		}
+		// for (int x = 0; x < dims.size(); x++) {
+		// 	std::cout << dims[x].getName() << std::endl;
+		// 	// dims[x].printValues();
+		// }
 		int xSize = dims[0].getNonRepSize();
 		int ySize = dims[1].getNonRepSize();
 		int zSize = dims[2].getNonRepSize();
 		bool xDim = dims[0].getName() != "Space Holder";
 		bool yDim = dims[1].getName() != "Space Holder";
 		bool zDim = dims[2].getName() != "Space Holder";
-		std::cout << "xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
+		std::cout << "----xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
 		float cubeScale = maxCubeScale / maxSize;
 		float xPos = initialPoint.x;
@@ -424,15 +347,12 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 			int z = 0;
 			
 		}
-		std::cout << "After added cube..." << std::endl;
+		std::cout << "----After added cube..." << std::endl;
 		_scene = bsg::scene();
-		_shader = new bsg::shaderMgr();
-		_axesShader = new bsg::shaderMgr();
-		_lights = new bsg::lightList();
-		_oscillator = 0.0f;
-		_initializeScene();
-		// exit(0);
+        updateScene();
+        std::cout << "----After updated scene..." << std::endl;
 		_scene.prepare();
+		std::cout << "----After prepared scene..." << std::endl;
 		break;
 	}
 }
@@ -452,12 +372,12 @@ void DemoVRApp::_checkContext() {
 	}
 
 // Now that we have a graphics context, let's look at what's inside.
-	std::cout << "Hardware check: " << glGetString(GL_RENDERER) // e.g. Intel 3000 OpenGL Engine
+	std::cout << "----Hardware check: " << glGetString(GL_RENDERER) // e.g. Intel 3000 OpenGL Engine
 			<< " / " << glGetString(GL_VERSION)    // e.g. 3.2 INTEL-8.0.61
 			<< std::endl;
 
 	if (glewIsSupported("GL_VERSION_2_1")) {
-		std::cout << "Software check: Ready for OpenGL 2.1." << std::endl;
+		std::cout << "----Software check: Ready for OpenGL 2.1." << std::endl;
 	} else {
 		throw std::runtime_error("Software check: OpenGL 2.1 not supported.");
 	}
@@ -470,9 +390,9 @@ void DemoVRApp::_checkContext() {
 	glEnable(GL_DEPTH_TEST);
 
 	if (glIsEnabled(GL_DEPTH_TEST)) {
-		std::cout << "Depth test enabled" << std::endl;
+		std::cout << "----Depth test enabled" << std::endl;
 	} else {
-		std::cout << "No depth test enabled" << std::endl;
+		std::cout << "----No depth test enabled" << std::endl;
 	}
 
 // This is just a performance enhancement that allows OpenGL to
@@ -491,18 +411,47 @@ void DemoVRApp::_checkContext() {
 // in a non-graphical sense.
 void DemoVRApp::_showCameraPosition() {
 
-	std::cout << "Camera is at (" << _scene.getCameraPosition().x << ", " << _scene.getCameraPosition().y << ", "
+	std::cout << "----Camera is at (" << _scene.getCameraPosition().x << ", " << _scene.getCameraPosition().y << ", "
 			<< _scene.getCameraPosition().z << ")... ";
-	std::cout << "looking at (" << _scene.getLookAtPosition().x << ", " << _scene.getLookAtPosition().y << ", "
+	std::cout << "----Looking at (" << _scene.getLookAtPosition().x << ", " << _scene.getLookAtPosition().y << ", "
 			<< _scene.getLookAtPosition().z << ")." << std::endl;
 }
 
 
-// void DemoVRApp::_updateScene(){
-	
-// }
-void DemoVRApp::_initializeScene() {
+void DemoVRApp::updateScene(){
+	// Fumeng: I don't understand why we would have to new everything every time
 
+	_axesSet = new bsg::drawableAxes(_axesShader, 10.0f);
+
+	_viveController = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
+	_viveController->setScale(0.5f);
+
+	_viveController2 = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
+	_viveController2->setScale(0.5f);
+
+
+	_scene.addObject(_axesSet);
+	std::cout << "----# Cubes: " << cubes.size() << std::endl;
+	if (cubes.size()) {
+		for(bsg::drawableCube *cb : cubes)
+		{
+			// std::cout << "added cube" << std::endl;
+			_scene.addObject(cb);
+		}
+	}
+	if (labels.size()) {
+		for (bsg::drawableSquare *lb : labels)
+		{
+			// std::cout << "added label" << std::endl;
+			_scene.addObject(lb);
+		}
+	}
+	_scene.addObject(_viveController);
+	_scene.addObject(_viveController2);
+}
+
+void DemoVRApp::_initializeScene() {
+	std::cout << "----Initialize Scene..." << std::endl;
 // Create a list of lights.  If the shader you're using doesn't use
 // lighting, and the shapes don't have textures, this is irrelevant.
 	_lights->addLight(glm::vec4(0.0f, 0.0f, -3.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -519,65 +468,11 @@ void DemoVRApp::_initializeScene() {
 	_shader->compileShaders();
 
 	// Now add our rectangle to the scene.
-	//_scene.addObject(_rectangle);
-	//_scene.addObject(_cube);
 
 	_axesShader->addShader(bsg::GLSHADER_VERTEX, "../shaders/shader2.vp");
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
 	_axesShader->compileShaders();
 
-	_axesSet = new bsg::drawableAxes(_axesShader, 10.0f);
-
-	// Now add the axes.
-	_scene.addObject(_axesSet);
-	std::cout << "cubes: " << cubes.size() << std::endl;
-	if (cubes.size()) {
-		for(bsg::drawableCube *cb : cubes)
-		{
-			// std::cout << "added cube" << std::endl;
-			_scene.addObject(cb);
-		}
-	}
-	if (labels.size()) {
-		for (bsg::drawableSquare *lb : labels)
-		{
-			// std::cout << "added label" << std::endl;
-			_scene.addObject(lb);
-		}
-	}
-
-	_viveController = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
-	_viveController->setScale(0.5f);
-
-	_viveController2 = new bsg::drawableObjModel(_shader, "../data/vr_controller_vive_1_5.obj");
-	_viveController2->setScale(0.5f);
-
-	_scene.addObject(_viveController);
-	_scene.addObject(_viveController2);
-
-
-	// Some fonts cause segfaults for no good reason on some platforms (Mac). For example, '2', '3', and '5' in 
-	// Arial causes the crash, but other characters/fonts do not. Just use times.
-
-	/*ft_drawString("../fonts/times.ttf", "Lorem ipsum dolor",
-			glm::vec3(1.0, 1.0, 1.0), 20, 'f', _cube);
-	ft_drawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100,
-			'b', _cube);
-	ft_drawString("../fonts/times.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100,
-			'u', _cube);
-	ft_drawString("../fonts/times.ttf", "0123456789", glm::vec3(0.0, 1.0, 0.0),
-			100, 'd', _cube);
-	ft_drawString("../fonts/times.ttf", "times", glm::vec3(1.0, 1.0, 0.0), 100,
-			'l', _cube);
-	ft_drawString("../fonts/times.ttf", "value", glm::vec3(1.0, 1.0, 1.0), 100,
-			'r', _cube);*/
-//	FTDrawString("../fonts/times.ttf", "Lorem ipsum dolor", glm::vec3(1.0, 1.0, 1.0), 20, 'f');
-//	FTDrawString("../fonts/times.ttf", "1", glm::vec3(0.0, 1.0, 1.0), 100, 'b');
-//	FTDrawString("../fonts/times.ttf", "2", glm::vec3(0.0, 0.0, 1.0), 100, 'u');
-//	FTDrawString("../fonts/times.ttf", "0123456789", glm::vec3(0.0, 1.0, 0.0), 100, 'd');
-//	FTDrawString("../fonts/times.ttf", "times", glm::vec3(1.0, 1.0, 0.0), 100, 'l');
-//	FTDrawString("../fonts/times.ttf", "value", glm::vec3(1.0, 1.0, 1.0), 100, 'r');
-// so far so good
 }
 
 void DemoVRApp::updateCubes() {
@@ -602,7 +497,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 	// Quit if the escape button is pressed
 
 	if (event.getName() != "HTC_HMD_1" && event.getName() != "HTC_TrackingReference_1" && event.getName() != "HTC_TrackingReference_2" && event.getName() != "HTC_Controller_1" && event.getName() != "HTC_Controller_2" && event.getName() != "HTC_Controller_Right" && event.getName() != "HTC_Controller_Left" && event.getName() != "FrameStart") {
-		std::cout << event.getName() << std::endl;
+		// std::cout << event.getName() << std::endl;
 	}
 	if (event.getName() == "HTC_HMD_1") {
 		if (!hmd) {
@@ -640,7 +535,6 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		updateStage();
 	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down" || event.getName() == "HTC_Controller_Right_Axis0Button_Pressed" || event.getName() == "HTC_Controller_1_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
-		std::cout << _stage << std::endl;
 		updateStage();
 	}
 	else if (event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Left") {
@@ -664,7 +558,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 				glm::vec3 rotation = glm::vec3(atan2(pose[1][0], pose[0][0]), atan2(-pose[2][0], sqrt(pose[2][1] * pose[2][1] + pose[2][2] * pose[2][2])), atan2(pose[2][1], pose[2][2]));
 				positionOffset = position - translationStart;
 				rotationOffset = rotation - rotationStart;
-				std::cout << rotation.x << " " << rotation.y << " " << rotation.z << std::endl;
+				std::cout << "----"<< rotation.x << " " << rotation.y << " " << rotation.z << std::endl;
 				updateCubes();
 				translationStart = position;
 				rotationStart = rotation;
@@ -677,7 +571,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		// _showCameraPosition();
 	}
 	else if (event.getName().length() > 4 && event.getName().substr(0, 3) == "Kbd") {
-		std::cout << event.getName() << std::endl;
+		std::cout << "----" << event.getName() << std::endl;
 		processKeys(event.getName().at(3));
 	}
 }
@@ -694,6 +588,7 @@ void DemoVRApp::onVRRenderGraphicsContext(const MinVR::VRGraphicsState &renderSt
 	if (renderState.isInitialRenderCall()) {
 		_checkContext();
 		_initializeScene();
+		updateScene();
 		dfr::init();
 		// exit(0);
 		_scene.prepare();

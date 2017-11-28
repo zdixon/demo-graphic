@@ -20,7 +20,7 @@ StageController::~StageController() {
 
 void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & arr, int stage) {
 	stage = (stage + 7) % 7;
-	std::cout << stage << std::endl;
+	std::cout << "----stage: "<< stage << std::endl;
 
 	switch (stage) {
 	case 0:
@@ -42,7 +42,7 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 		stage5(dims);
 		break;
 	case 6:
-		cout << "#####THE LAST STAGE IS NOT WORKING#######" << endl;
+		// cout << "#####THE LAST STAGE IS NOT WORKING#######" << endl;
 		stage6(dims);
 		break;
 	}
@@ -178,7 +178,7 @@ void StageController::stage8(vector<Dimension<string> > & dims) {
 }
 
 void StageController::computeValueArray(vector<Dimension<string> > & dims, Array3D & arr) {
-	cout << "in computeValueArray" << endl;
+	cout << "----in computeValueArray" << endl;
 	Dimension<string> values;
 	vector<Dimension<string> > dimsRefined;
 
@@ -195,7 +195,7 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 	int X = dimsRefined[0].getNonRepSize();
 	int Y = dimsRefined[1].getNonRepSize();
 	int Z = dimsRefined[2].getNonRepSize();
-	std::cout << "" << X << "," << Y << "," << Z << std::endl;
+	std::cout << "----" << X << "," << Y << "," << Z << std::endl;
 	arr.resize(boost::extents[X][Y][Z]);
 	int index = 0;
 
@@ -223,15 +223,15 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 	/*
 	 * double check the values in array
 	 */
-	for (int xi = 0; xi < X; xi++) {
-		for (int yi = 0; yi < Y; yi++) {
-			for (int zi = 0; zi < Z; zi++) {
-				std::cout << arr[xi][yi][zi] << " ";
-			}
-		}
-		std::cout << std::endl;
+	// for (int xi = 0; xi < X; xi++) {
+	// 	for (int yi = 0; yi < Y; yi++) {
+	// 		for (int zi = 0; zi < Z; zi++) {
+	// 			std::cout << arr[xi][yi][zi] << " ";
+	// 		}
+	// 	}
+	// 	std::cout << std::endl;
 
-	}
+	// }
 	dims = dimsRefined;
-	cout << "out computeValueArray" << endl;
+	// cout << "----end computeValueArray" << endl;
 }
