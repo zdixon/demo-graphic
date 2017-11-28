@@ -23,8 +23,6 @@
 unsigned char image[HEIGHT][WIDTH];
 unsigned char imgdata[HEIGHT * WIDTH * 4];
 
-bsg::drawableObjModel* _viveController;
-bsg::drawableObjModel* _viveController2;
 
 
 bool hmd = false;
@@ -59,7 +57,7 @@ void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 // The functionality of these methods is assumed by the MinVR apparatus.
 
 DemoVRApp::DemoVRApp(int argc, char** argv) :
-		MinVR::VRApp(argc, argv), _scene(bsg::scene()), _shader(new bsg::shaderMgr()), _axesShader(
+		MinVR::VRApp(argc, argv), _axesSet(0), _viveController2(0), _viveController(0), _scene(bsg::scene()), _shader(new bsg::shaderMgr()), _axesShader(
 				new bsg::shaderMgr()), _lights(new bsg::lightList()), _oscillator(0.0f), _testCube(Cube()), _controller(
 				StageController()), _stage(-1),_cameraPos(glm::vec3(0)) {
 
@@ -144,12 +142,26 @@ void DemoVRApp::setExamples(vector<Dimension<string> > & dims, Array3D & arr) {
 
 
 void DemoVRApp::updateStage() {
+	std::cout << "----updateStage...."  << std::endl;
 	vector<Dimension<string> > dims;
 	Array3D arr;
 	_controller.setUpDimsArr(dims, arr, _stage);
+	_scene = bsg::scene();
+
+	// for(auto c: cubes){
+	// 	if(c) delete c;
+	// }
+	// for(auto l: labels){
+	// 	if(l) delete l;
+	// }
+
 	cubes.clear();
 	labels.clear();
 	dataToCubes(dims, arr);
+
+    updateScene();
+    _scene.prepare();
+	
 }
 
 void DemoVRApp::processKeys(unsigned char key) {
@@ -262,7 +274,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					cubes.insert(cube);
 
 					//std::cout << "Added cube" << std::endl;
-					// std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 
 				}
 			}
@@ -284,7 +296,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		}
 		for (int x = 0; x < dims[1].getSize(); x++) {
 			std::string str = " "; int f = 1;
-			dims[0].getValueAt(x, str, f);
+			dims[1].getValueAt(x, str, f);
 			if (knownY.find(str) == knownY.end()) {
 				yLabels.push_back(str);
 				knownY.insert(str);
@@ -292,7 +304,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		}
 		for (int x = 0; x < dims[2].getSize(); x++) {
 			std::string str = " "; int f = 1;
-			dims[0].getValueAt(x, str, f);
+			dims[2].getValueAt(x, str, f);
 			if (knownZ.find(str) == knownZ.end()) {
 				zLabels.push_back(str);
 				knownZ.insert(str);
@@ -342,7 +354,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 0.0, 1.0), 100, label);
 						labels.insert(label);
 					}
-
+					std::cout << "label x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 				}
 			}
 		}
@@ -352,12 +364,6 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 			int z = 0;
 			
 		}
-		std::cout << "----After added cube..." << std::endl;
-		_scene = bsg::scene();
-        updateScene();
-        std::cout << "----After updated scene..." << std::endl;
-		_scene.prepare();
-		std::cout << "----After prepared scene..." << std::endl;
 		break;
 	}
 }
@@ -425,6 +431,14 @@ void DemoVRApp::_showCameraPosition() {
 
 void DemoVRApp::updateScene(){
 	// Fumeng: I don't understand why we would have to new everything every time
+	std::cout << "----updating scene" << std::endl;
+
+	// if(_axesSet)
+	// 	std::cout << _axesSet << std::endl;
+	// if(_viveController)
+	// 	delete _viveController;
+	// if(_viveController2)
+	// 	delete _viveController2;
 
 	_axesSet = new bsg::drawableAxes(_axesShader, 10.0f);
 

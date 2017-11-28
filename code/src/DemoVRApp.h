@@ -60,6 +60,9 @@ private:
 	std::string _fragmentFile;
 	StageController _controller;
 
+	bsg::drawableObjModel* _viveController;
+	bsg::drawableObjModel* _viveController2;
+
 	// These functions from demo2.cpp are not needed here:
 	//
 	//    init()
