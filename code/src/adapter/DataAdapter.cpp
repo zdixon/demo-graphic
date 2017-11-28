@@ -6,8 +6,10 @@
  */
 #include <algorithm>   // transform()
 #include <cctype>      // toupper(), tolower()
+
 #include <boost/algorithm/string.hpp>
 #include "DataAdapter.h"
+
 /**
  *
  */
@@ -379,7 +381,8 @@ void DataAdapter::parseResultSet(sql::ResultSet * rs, vector<Dimension<string> >
 
 		Dimension<string> sf = Dimension<string>(name);
 		while (rs->next()) {
-			sf.addRepValue(rs->getString(name));
+			std::string s = rs->getString(name);
+			sf.addRepValue(s);
 		}
 		dims.push_back(sf);
 

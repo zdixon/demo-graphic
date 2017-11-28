@@ -7,9 +7,14 @@
 #include <iostream>
 #include <ft2build.h>
 
+
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+#include <iomanip>
+#include <locale>
+#include <stdlib.h>     /* atof */
 
 #include "stb_image_write.h"
 
@@ -33,6 +38,31 @@ glm::vec3 rotationOffset = glm::vec3(0.0, 0.0, 0.0);
 bool dragging = false;
 glm::vec3 translationStart;
 glm::vec3 rotationStart;
+
+class comma_numpunct : public std::numpunct<char>
+{
+  protected:
+    virtual char do_thousands_sep() const
+    {
+        return ',';
+    }
+
+    virtual std::string do_grouping() const
+    {
+        return "\03";
+    }
+};
+
+
+string formatWithCommas(double s)
+{
+    std::stringstream ss;
+    std::locale comma_locale(std::locale(), new comma_numpunct());
+    ss.imbue(comma_locale);
+    ss  << std::fixed << std::setprecision(2) << s;
+    return ss.str();
+}
+
 
 void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 	FT_Int i, j, p, q;
@@ -259,7 +289,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
-					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
+					std::string dbl = "\n\n  " + formatWithCommas(arr[x][y][z]);
 					// Fumeng : the previous line was "arr[y][x][z]", and I don't know why...
 
 					//if (xDim && yDim && zDim) {
@@ -271,7 +301,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					char_array.push_back(0);
 
 					ft_drawString("../fonts/times.ttf", &char_array[0],
-						glm::vec3(0.0, 0.0, 0.0), 100, cube);
+						glm::vec3(0.0, 0.0, 0.0), 80, cube);
 					cube->setScale(cubeScale);
 	
 					cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
@@ -329,6 +359,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
 						std::string str = yLabels[y];
+
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.0, 0.0), 100, label);
