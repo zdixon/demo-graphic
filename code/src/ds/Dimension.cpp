@@ -56,11 +56,13 @@ std::string Dimension<T>::getName() {
  *
  */
 template<typename T>
-boost::optional<T> Dimension<T>::getValueAt(int i) {
+void Dimension<T>::getValueAt(int i, T &t, int &f) {
 	if (_valueVector.size() < i + 1) {
-		return boost::none;
+		f = 0;
+	} else {
+		f = 1;
+		t = _valueVector.at(i);
 	}
-	return _valueVector.at(i);
 }
 /**
  *

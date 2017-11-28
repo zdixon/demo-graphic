@@ -235,7 +235,7 @@ void DemoVRApp::processKeys(unsigned char key) {
 	// want things to go faster, increase this step.
 	float step = 0.5f;
 
-	std::cout << "Key: " << key << std::endl;
+	// std::cout << "Key: " << key << std::endl;
 	_showCameraPosition();
 
 	// This function processes only the 'normal' keys.  The arrow keys
@@ -243,7 +243,6 @@ void DemoVRApp::processKeys(unsigned char key) {
 	switch (key) {
 	case 27:
 		exit(0);
-
 		// These next few are for steering the position of the viewer.
 	case 'a':
 		_scene.addToCameraPosition(glm::vec3(-step, 0.0f, 0.0f));
@@ -317,14 +316,14 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
-					//std::cout << "Adding Cube";
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
-					std::string dbl = boost::lexical_cast<std::string>(arr[y][x][z]);
+					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
+					// Fumeng : the previous line was "arr[y][x][z]", and I don't know why...
 					//if (xDim && yDim && zDim) {
 					//	dbl = dbl + dims[0].getValueAt(y + x * ySize + z * ySize * xSize) + dims[1].getValueAt(y + x * ySize + z * ySize * xSize) + dims[2].getValueAt(y + x * ySize + z * ySize * xSize);
 					//}
-					std::cout << dbl << std::endl;
+					// std::cout << dbl << std::endl;
 					std::vector<char> char_array(dbl.begin(), dbl.end());
 					char_array.push_back(0);
 
@@ -337,7 +336,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					cubes.insert(cube);
 
 					//std::cout << "Added cube" << std::endl;
-					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+					// std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 
 				}
 			}
@@ -350,42 +349,24 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		std::vector<std::string> zLabels;
 		std::set<std::string> knownZ;
 		for (int x = 0; x < dims[0].getSize(); x++) {
-			boost::optional<std::string> strop = dims[0].getValueAt(x);
-			std::string str;
-			if (strop) {
-				str = strop.get();
-			}
-			else {
-				str = " ";
-			}
+			std::string str = " "; int f = 1;
+			dims[0].getValueAt(x, str, f);
 			if (knownX.find(str) == knownX.end()) {
 				xLabels.push_back(str);
 				knownX.insert(str);
 			}
 		}
 		for (int x = 0; x < dims[1].getSize(); x++) {
-			boost::optional<std::string> strop = dims[1].getValueAt(x);
-			std::string str;
-			if (strop) {
-				str = strop.get();
-			}
-			else {
-				str = " ";
-			}
+			std::string str = " "; int f = 1;
+			dims[0].getValueAt(x, str, f);
 			if (knownY.find(str) == knownY.end()) {
 				yLabels.push_back(str);
 				knownY.insert(str);
 			}
 		}
 		for (int x = 0; x < dims[2].getSize(); x++) {
-			boost::optional<std::string> strop = dims[2].getValueAt(x);
-			std::string str;
-			if (strop) {
-				str = strop.get();
-			}
-			else {
-				str = " ";
-			}
+			std::string str = " "; int f = 1;
+			dims[0].getValueAt(x, str, f);
 			if (knownZ.find(str) == knownZ.end()) {
 				zLabels.push_back(str);
 				knownZ.insert(str);
@@ -400,43 +381,18 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						label->setPosition(glm::vec3(xPos + ((x - 1) * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
-						/*boost::optional<std::string> strop = dims[1].getValueAt(x + y * xSize + z * xSize * ySize);
-						std::string str;
-						if (strop) {
-							str = strop.get();
-						}
-						else {
-							str = "";
-						}*/
 						std::string str = yLabels[y];
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.0, 0.0), 100, label);
 						labels.insert(label);
 					}
-					/*else if (x == xSize - 1) {
-						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-						label->setPosition(glm::vec3(xPos + ((x + 1) * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
-						label->setScale(cubeScale);
-						std::string str = dims[1].getValueAt(y); // y label
-						std::vector<char> char_array(str.begin(), str.end());
-						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 1.0, 1.0), 100, label);
-						labels.insert(label);
-					}*/
 					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 						label->setPosition(glm::vec3(xPos + (x * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
-						/*boost::optional<std::string> strop = dims[0].getValueAt(y + x * ySize + z * ySize * xSize);
-						std::string str;
-						if (strop) {
-							str = strop.get();
-						}
-						else {
-							str = "";
-						}*/
+
 						std::string str = xLabels[x];
 						if (str == "") {
 							str = " ";
@@ -452,14 +408,6 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						label->setPosition(glm::vec3(xPos + (x * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
-						/*boost::optional<std::string> strop = dims[2].getValueAt(y + x * ySize + z * ySize * xSize); // z label
-						std::string str;
-						if (strop) {
-							str = strop.get();
-						}
-						else {
-							str = "";
-						}*/
 						std::string str = zLabels[z];
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
@@ -549,6 +497,10 @@ void DemoVRApp::_showCameraPosition() {
 			<< _scene.getLookAtPosition().z << ")." << std::endl;
 }
 
+
+// void DemoVRApp::_updateScene(){
+	
+// }
 void DemoVRApp::_initializeScene() {
 
 // Create a list of lights.  If the shader you're using doesn't use
@@ -582,14 +534,14 @@ void DemoVRApp::_initializeScene() {
 	if (cubes.size()) {
 		for(bsg::drawableCube *cb : cubes)
 		{
-			std::cout << "added cube" << std::endl;
+			// std::cout << "added cube" << std::endl;
 			_scene.addObject(cb);
 		}
 	}
 	if (labels.size()) {
 		for (bsg::drawableSquare *lb : labels)
 		{
-			std::cout << "added label" << std::endl;
+			// std::cout << "added label" << std::endl;
 			_scene.addObject(lb);
 		}
 	}

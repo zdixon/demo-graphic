@@ -105,7 +105,7 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # Apple-specific code
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOSX -lmysqlcppconn -L/usr/local/opt/freetype/lib -lfreetype -I/usr/local/opt/freetype/include -I/usr/local/opt/freetype/include/freetype2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DOSX -lmysqlcppconn -L/usr/local/opt/freetype/lib -lfreetype -I/usr/local/opt/freetype/include -I/usr/local/opt/freetype/include/freetype2")
   set(MYSQL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include")
   set(MYSQL_INCLUDE_CPPCONN_DIR "${CMAKE_SOURCE_DIR}/external/mysql/macos/include/cppconn")
   set(MYSQL_LIBRARY "${CMAKE_SOURCE_DIR}/external/mysql/macos/lib")

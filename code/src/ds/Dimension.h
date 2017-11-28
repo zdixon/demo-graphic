@@ -15,6 +15,7 @@
 #include <set>
 #include <vector>
 #include <boost/optional/optional.hpp>
+// #include <boost/optional.hpp>
 
 typedef bool empty;
 //using namespace std;
@@ -37,7 +38,7 @@ public:
 	std::string getName();
 
 	// get the value
-	boost::optional<T> getValueAt(int i);
+	void getValueAt(int i, T &t, int &f);
 
 	// get all the values
 	void getRepValues(std::vector<T> & vs);

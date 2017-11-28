@@ -202,33 +202,17 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 	for (int xi = 0; xi < X; xi++) {
 		for (int yi = 0; yi < Y; yi++) {
 			for (int zi = 0; zi < Z; zi++) {
-				if (Y == 1 && Z == 1 && yi == 0 && zi == 0) {
-					boost::optional<std::string> str = values.getValueAt(index);
-					if (str) {
-						arr[xi][yi][zi] = atof(str.get().c_str());
+					std::string str = ""; int f = 1;
+					values.getValueAt(index, str, f);
+				if ((Y == 1 && Z == 1 && yi == 0 && zi == 0)|| (Y != 1 && Z == 1 && zi == 0) || (Y != 1 && Z != 1)) {
+					if (f) {
+						arr[xi][yi][zi] = atof(str.c_str());
 					}
 					else {
 						arr[xi][yi][zi] = -1;
 					}
 					index++;
-				} else if (Y != 1 && Z == 1 && zi == 0) {
-					boost::optional<std::string> str = values.getValueAt(index);
-					if (str) {
-						arr[xi][yi][zi] = atof(str.get().c_str());
-					}
-					else {
-						arr[xi][yi][zi] = -1;
-					}
-					index++;
-				} else if (Y != 1 && Z != 1) {
-					boost::optional<std::string> str = values.getValueAt(index);
-					if (str) {
-						arr[xi][yi][zi] = atof(str.get().c_str());
-					}
-					else {
-						arr[xi][yi][zi] = -1;
-					}
-					index++;
+
 				} else {
 					arr[xi][yi][zi] = -1;
 				}
