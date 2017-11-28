@@ -157,7 +157,7 @@ void DemoVRApp::updateStage() {
 
 	cubes.clear();
 	labels.clear();
-	
+
 	dataToCubes(dims, arr);
 
     updateScene();
@@ -252,6 +252,11 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
+
+					 int xoffSet = x - xSize / 2;
+					 int yoffSet = y - ySize / 2;
+					 int zoffSet = z - zSize / 2;
+
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
 					std::string dbl = boost::lexical_cast<std::string>(arr[x][y][z]);
@@ -268,8 +273,8 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					ft_drawString("../fonts/times.ttf", &char_array[0],
 						glm::vec3(0.0, 0.0, 0.0), 100, cube);
 					cube->setScale(cubeScale);
-					int xoffSet = x - xSize / 2;
-					cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
+	
+					cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
 					cube->setRotation(cube->getPitchYawRoll() + rotationOffset);
 					//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
 					cubes.insert(cube);
@@ -316,9 +321,11 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
 					 int xoffSet = x - xSize / 2;
+					 int yoffSet = y - ySize / 2;
+					 int zoffSet = z - zSize / 2;
 					if (x == 0 && z == (zSize - 1) && yDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-						label->setPosition(glm::vec3(xPos + ((xoffSet - 1) * step), yPos - (y * step), zPos + (z * step)) + positionOffset);
+						label->setPosition(glm::vec3(xPos + ((xoffSet - 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
 						std::string str = yLabels[y];
@@ -330,7 +337,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 					
-						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
+						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
 
@@ -346,7 +353,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					
 					if (y == (ySize - 1) && x == 0 && zDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((y + 1) * step), zPos + (z * step)) + positionOffset);
+						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale);
 						std::string str = zLabels[z];
