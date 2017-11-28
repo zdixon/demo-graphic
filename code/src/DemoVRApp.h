@@ -32,6 +32,8 @@ private:
 	bsg::drawableCube* _cube;
 	bsg::drawableCube* _cube2;
   	bsg::drawableRectangle* _rectangle;
+	glm::vec3 _cameraPos;
+
 
 	std::set<bsg::drawableCube *> cubes;
 	std::set<bsg::drawableSquare *> labels;

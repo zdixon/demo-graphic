@@ -56,7 +56,16 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 /*
  * Fumeng: I hard-code the sqls, but we should be able to use some inputs to parse sqls
  */
-void StageController::stage0(vector<Dimension<string> > & dims) {
+
+ void StageController::stage0(vector<Dimension<string> > & dims) {
+	string sql = "SELECT SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
+			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI "
+			"WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID ";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+}
+
+void StageController::stage1(vector<Dimension<string> > & dims) {
 	string sql = "SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time',SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
 			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI "
 			"WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID "
@@ -65,7 +74,7 @@ void StageController::stage0(vector<Dimension<string> > & dims) {
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
-void StageController::stage1(vector<Dimension<string> > & dims) {
+void StageController::stage2(vector<Dimension<string> > & dims) {
 	string sql =
 			"SELECT DATE_FORMAT (SNAPSHOT_D, '%M') as 'Time', DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
 					"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI "
@@ -76,7 +85,7 @@ void StageController::stage1(vector<Dimension<string> > & dims) {
 	_adapter.getResult(sql, dims);
 }
 
-void StageController::stage2(vector<Dimension<string> > & dims) {
+void StageController::stage3(vector<Dimension<string> > & dims) {
 	string sql =
 			"SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time', KPI_BUSINESS_NM as 'Business', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
 					"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi "
@@ -88,7 +97,7 @@ void StageController::stage2(vector<Dimension<string> > & dims) {
 	_adapter.getResult(sql, dims);
 
 }
-void StageController::stage3(vector<Dimension<string> > & dims) {
+void StageController::stage4(vector<Dimension<string> > & dims) {
 	string sql = "SELECT KPI_CATEGORY_COARSE_X as 'Money_Category',"
 			"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Time',"
 			"KPI_BUSINESS_NM as 'Business',"
@@ -101,7 +110,7 @@ void StageController::stage3(vector<Dimension<string> > & dims) {
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
-void StageController::stage4(vector<Dimension<string> > & dims) {
+void StageController::stage5(vector<Dimension<string> > & dims) {
 	string sql = "SELECT AVG(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
 			"DATE_FORMAT (SNAPSHOT_D,  '%M') as 'Time',"
 			"REG_ABBREV_C as 'Account_Type',"
@@ -119,7 +128,7 @@ void StageController::stage4(vector<Dimension<string> > & dims) {
 
 }
 
-void StageController::stage5(vector<Dimension<string> > & dims) {
+void StageController::stage6(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
 			"AGE_BKT as 'Age',"
 			"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time',"
@@ -140,7 +149,7 @@ void StageController::stage5(vector<Dimension<string> > & dims) {
 
 }
 
-void StageController::stage6(vector<Dimension<string> > & dims) {
+void StageController::stage7(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
 		"BRANCH_REGION_X as 'Region',"
 		//"IN_RADIUS_BRANCH_NM as 'Region_Branch',"
@@ -158,13 +167,6 @@ void StageController::stage6(vector<Dimension<string> > & dims) {
 		//"AND SNAPSHOT_D >= '2014-01-01' AND SNAPSHOT_D <= '2016-12-31' "
 		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), BRANCH_REGION_X, KPI_CATEGORY_COARSE_X;"; // , IN_RADIUS_BRANCH_NM; ";
 
-	dims = vector<Dimension<string> >();
-	_adapter.getResult(sql, dims);
-
-}
-
-void StageController::stage7(vector<Dimension<string> > & dims) {
-	string sql = "";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 
