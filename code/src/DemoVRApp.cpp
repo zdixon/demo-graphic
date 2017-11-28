@@ -157,6 +157,7 @@ void DemoVRApp::updateStage() {
 
 	cubes.clear();
 	labels.clear();
+	
 	dataToCubes(dims, arr);
 
     updateScene();
@@ -274,7 +275,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					cubes.insert(cube);
 
 					//std::cout << "Added cube" << std::endl;
-					std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+					// std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 
 				}
 			}
@@ -354,7 +355,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 0.0, 1.0), 100, label);
 						labels.insert(label);
 					}
-					std::cout << "label x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+					// std::cout << "label x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 				}
 			}
 		}
