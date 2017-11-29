@@ -31,7 +31,7 @@ unsigned char imgdata[HEIGHT * WIDTH * 4];
 
 
 bool hmd = false;
-float maxCubeScale = 5.0;
+float maxCubeScale = 2.0;
 glm::vec3 initialPoint = glm::vec3(0.0, 0.0, 0.0);
 glm::vec3 positionOffset = glm::vec3(0.0, 0.0, 0.0);
 glm::vec3 rotationOffset = glm::vec3(0.0, 0.0, 0.0);
@@ -89,7 +89,7 @@ void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y) {
 DemoVRApp::DemoVRApp(int argc, char** argv) :
 		MinVR::VRApp(argc, argv), _axesSet(0), _viveController2(0), _viveController(0), _scene(bsg::scene()), _shader(new bsg::shaderMgr()), _axesShader(
 				new bsg::shaderMgr()), _lights(new bsg::lightList()), _oscillator(0.0f), _testCube(Cube()), _controller(
-				StageController()), _stage(-1),_cameraPos(glm::vec3(0)) {
+				StageController()), _stage(-1),_cameraPos(glm::vec3(0.5, 1, 5)) {
 
 	_vertexFile = std::string(argv[1]);
 	_fragmentFile = std::string(argv[2]);
@@ -274,7 +274,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		bool zDim = dims[2].getName() != "Space Holder";
 		std::cout << "----xSize " << xSize << "; ySize " << ySize << "; zSize " << zSize << std::endl;
 		int maxSize = std::max(std::max(xSize, ySize), zSize);
-		float cubeScale = maxCubeScale / maxSize;
+		float cubeScale = maxCubeScale / maxSize * 2;
 		float xPos = initialPoint.x;
 		float yPos = initialPoint.y;
 		float zPos = initialPoint.z;
@@ -357,7 +357,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 						label->setPosition(glm::vec3(xPos + ((xoffSet - 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
-						label->setScale(cubeScale);
+						label->setScale(cubeScale * 1.1);
 						std::string str = yLabels[y];
 
 						std::vector<char> char_array(str.begin(), str.end());
@@ -370,7 +370,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					
 						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
-						label->setScale(cubeScale);
+						label->setScale(cubeScale * 1.1);
 
 						std::string str = xLabels[x];
 						if (str == "") {
@@ -386,7 +386,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
 						label->setRotation(label->getPitchYawRoll() + rotationOffset);
-						label->setScale(cubeScale);
+						label->setScale(cubeScale * 1.1);
 						std::string str = zLabels[z];
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
@@ -532,7 +532,7 @@ void DemoVRApp::_initializeScene() {
 	_axesShader->addShader(bsg::GLSHADER_FRAGMENT, "../shaders/shader.fp");
 	_axesShader->compileShaders();
 
-	_cameraPos = _scene.getCameraPosition();
+	// _cameraPos = _scene.getCameraPosition();
 
 }
 

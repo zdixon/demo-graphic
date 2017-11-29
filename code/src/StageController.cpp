@@ -19,7 +19,7 @@ StageController::~StageController() {
 }
 
 void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & arr, int stage) {
-	stage = (stage + 8) % 8;
+	stage = (stage + 9) % 9;
 	std::cout << "----stage: "<< stage << std::endl;
 
 	switch (stage) {
@@ -46,6 +46,9 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 		break;
 	case 7:
 		stage7(dims);
+		break;
+	case 8:
+		stage8(dims);
 		break;
 	}
 
@@ -76,6 +79,7 @@ void StageController::stage1(vector<Dimension<string> > & dims) {
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
+
 void StageController::stage2(vector<Dimension<string> > & dims) {
 	string sql =
 			"SELECT DATE_FORMAT (SNAPSHOT_D, '%M') as 'Time', DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year', SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
@@ -94,7 +98,7 @@ void StageController::stage3(vector<Dimension<string> > & dims) {
 					"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
 					"AND KPI_BUSINESS_NM = 'New_money' "
 					"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), KPI_BUSINESS_NM "
-					"ORDER BY 'Time';";
+					"ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m') ;";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 
@@ -102,11 +106,12 @@ void StageController::stage3(vector<Dimension<string> > & dims) {
 void StageController::stage4(vector<Dimension<string> > & dims) {
 	string sql = "SELECT KPI_CATEGORY_COARSE_X as 'Money_Category',"
 			"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Time',"
-			"KPI_BUSINESS_NM as 'Business',"
+			"REG_ABBREV_C as 'Account_Type',"
 			"MAX(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
-			"FROM BDC_TXN_FACT_MA_MORE as base, BDC_KPI_DIM_MORE as kpi "
+			"FROM BDC_TXN_FACT_MA_MORE as base, BDC_KPI_DIM_MORE as kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
 			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
 			"AND KPI_BUSINESS_NM = 'New_money' "
+			"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
 			"GROUP BY DATE_FORMAT (SNAPSHOT_D,'%Y'), KPI_CATEGORY_COARSE_X "
 			"ORDER BY 'Time';";
 	dims = vector<Dimension<string> >();
@@ -120,10 +125,9 @@ void StageController::stage5(vector<Dimension<string> > & dims) {
 			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
 			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
 			"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
-			"AND REG_ABBREV_C='IRA' "
 			"AND KPI_BUSINESS_NM = 'New_money' "
-			"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
-			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%M') "
+			// "AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y%M') "
 			"ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m') ;";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
@@ -135,23 +139,39 @@ void StageController::stage6(vector<Dimension<string> > & dims) {
 			"AGE_BKT as 'Age',"
 			"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Time',"
 			"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
-			"KPI_BUSINESS_NM as 'Business',"
-			"KPI_CATEGORY_COARSE_X as 'Money_Category'"
-			"FROM BDC_TXN_FACT_MA_MORE base,BDC_KPI_DIM kpi, BDC_HOUSEHOLD_DEMOG demog,"
-			"BDC_INDIVIDUAL_MINI_DIM indi "
+			"KPI_CATEGORY_COARSE_X as 'Money_Category', "
+			"KPI_BUSINESS_NM as 'Business' "
+			"FROM BDC_TXN_FACT_MA_MORE base,BDC_KPI_DIM kpi, BDC_HOUSEHOLD_DEMOG demog, BDC_ACCOUNT_MINI_DIM mini_dim, BDC_INDIVIDUAL_MINI_DIM indi "
 			"WHERE     base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
 			"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
+			"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
 			"AND KPI_BUSINESS_NM = 'New_money' "
-			"AND KPI_CATEGORY_COARSE_X ='Retirement' "
+			"AND REG_ABBREV_C ='IRA' "
 			"AND base.IP_MINI_DIM_ID = indi.IP_MINI_DIM_ID "
+			"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
 			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), AGE_BKT "
-			"ORDER BY AGE_BKT,DATE_FORMAT (SNAPSHOT_D, '%Y');";
+			"ORDER BY AGE_BKT,DATE_FORMAT (SNAPSHOT_D, '%m');";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
-
 }
 
 void StageController::stage7(vector<Dimension<string> > & dims) {
+		string sql = "SELECT AVG(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
+			"DATE_FORMAT (SNAPSHOT_D,  '%M') as 'Time',"
+			"REG_ABBREV_C as 'Account_Type',"
+			"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year' "
+			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
+			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+			"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
+			"AND KPI_BUSINESS_NM = 'New_money' "
+			// "AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y%M') "
+			"ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m') ;";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+}
+
+void StageController::stage8(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
 		"BRANCH_REGION_X as 'Region',"
 		//"IN_RADIUS_BRANCH_NM as 'Region_Branch',"
@@ -165,21 +185,14 @@ void StageController::stage7(vector<Dimension<string> > & dims) {
 		"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
 		"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
 		"AND KPI_BUSINESS_NM = 'New_money' "
-		//"AND KPI_CATEGORY_COARSE_X ='Retirement' "
-		//"AND SNAPSHOT_D >= '2014-01-01' AND SNAPSHOT_D <= '2016-12-31' "
-		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), BRANCH_REGION_X, KPI_CATEGORY_COARSE_X;"; // , IN_RADIUS_BRANCH_NM; ";
+		"AND SNAPSHOT_D >= '2014-01-01' AND SNAPSHOT_D <= '2016-12-31' "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%m'), BRANCH_REGION_X, KPI_CATEGORY_COARSE_X;"; // , IN_RADIUS_BRANCH_NM; ";
 
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 
 }
 
-void StageController::stage8(vector<Dimension<string> > & dims) {
-	string sql = "";
-	dims = vector<Dimension<string> >();
-	_adapter.getResult(sql, dims);
-
-}
 
 void StageController::computeValueArray(vector<Dimension<string> > & dims, Array3D & arr) {
 	cout << "----in computeValueArray" << endl;
@@ -213,12 +226,12 @@ void StageController::computeValueArray(vector<Dimension<string> > & dims, Array
 						arr[xi][yi][zi] = atof(str.c_str());
 					}
 					else {
-						arr[xi][yi][zi] = -1;
+						arr[xi][yi][zi] = 0.00;
 					}
 					index++;
 
 				} else {
-					arr[xi][yi][zi] = -1;
+					arr[xi][yi][zi] = 0.00;
 				}
 
 			}
