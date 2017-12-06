@@ -324,7 +324,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						char_array.push_back(0);
 
 						ft_drawString("../fonts/times.ttf", &char_array[0],
-							glm::vec3(0.0, 0.0, 0.0), 80, cube);
+							glm::vec3(0.0, 0.0, 0.0), 72, cube);
 						cube->setScale(cubeScale);
 
 						cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step)));
@@ -392,7 +392,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5), 100, label);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5),00, label);
 						labels.insert(label);
 					}
 					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
