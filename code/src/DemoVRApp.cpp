@@ -33,11 +33,18 @@ unsigned char imgdata[HEIGHT * WIDTH * 4];
 bool hmd = false;
 float maxCubeScale = 2.0;
 glm::vec3 initialPoint = glm::vec3(0.0, 0.0, 0.0);
+bsg::drawableCube *firstCube;
+float divx;
+float divy;
+float divz;
 glm::vec3 positionOffset = glm::vec3(0.0, 0.0, 0.0);
 glm::vec3 rotationOffset = glm::vec3(0.0, 0.0, 0.0);
 bool dragging = false;
 glm::vec3 translationStart;
 glm::vec3 rotationStart;
+
+std::string controller1 = "";
+std::string controller2 = "";
 
 class comma_numpunct : public std::numpunct<char>
 {
@@ -175,6 +182,15 @@ void DemoVRApp::updateStage() {
 	std::cout << "----updateStage...."  << std::endl;
 	vector<Dimension<string> > dims;
 	Array3D arr;
+
+	if (cubes.size()) {
+		initialPoint = firstCube->getPosition() + positionOffset;
+		initialPoint.x -= divx;
+		initialPoint.y += divy;
+		initialPoint.z -= divz;
+		std::cout << "POINT: " << glm::to_string(initialPoint) << std::endl;
+	}
+
 	_controller.setUpDimsArr(dims, arr, _stage);
 	_scene = bsg::scene();
 
@@ -184,6 +200,8 @@ void DemoVRApp::updateStage() {
 	// for(auto l: labels){
 	// 	if(l) delete l;
 	// }
+
+
 
 	cubes.clear();
 	labels.clear();
@@ -279,6 +297,11 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		float yPos = initialPoint.y;
 		float zPos = initialPoint.z;
 		float step = cubeScale * 1.1;
+		std::cout << "Position offset: " << glm::to_string(positionOffset) << std::endl;
+		bsg::drawableCube *start = new bsg::drawableCube(_shader, 10, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		start->setScale(cubeScale / 4);
+		start->setPosition(initialPoint);
+		cubes.insert(start);
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
@@ -289,29 +312,36 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
-					std::string dbl = "\n\n  " + formatWithCommas(arr[x][y][z]);
-					// Fumeng : the previous line was "arr[y][x][z]", and I don't know why...
+						std::string dbl = "\n\n  " + formatWithCommas(arr[x][y][z]);
+						// Fumeng : the previous line was "arr[y][x][z]", and I don't know why...
 
-					//if (xDim && yDim && zDim) {
-					//	dbl = dbl + dims[0].getValueAt(y + x * ySize + z * ySize * xSize) + dims[1].getValueAt(y + x * ySize + z * ySize * xSize) + dims[2].getValueAt(y + x * ySize + z * ySize * xSize);
-					//}
-					// std::cout << dbl << std::endl;
+						//if (xDim && yDim && zDim) {
+						//	dbl = dbl + dims[0].getValueAt(y + x * ySize + z * ySize * xSize) + dims[1].getValueAt(y + x * ySize + z * ySize * xSize) + dims[2].getValueAt(y + x * ySize + z * ySize * xSize);
+						//}
+						// std::cout << dbl << std::endl;
 
-					std::vector<char> char_array(dbl.begin(), dbl.end());
-					char_array.push_back(0);
+						std::vector<char> char_array(dbl.begin(), dbl.end());
+						char_array.push_back(0);
 
-					ft_drawString("../fonts/times.ttf", &char_array[0],
-						glm::vec3(0.0, 0.0, 0.0), 80, cube);
-					cube->setScale(cubeScale);
-	
-					cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
-					cube->setRotation(cube->getPitchYawRoll() + rotationOffset);
-					//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
-					cubes.insert(cube);
+						ft_drawString("../fonts/times.ttf", &char_array[0],
+							glm::vec3(0.0, 0.0, 0.0), 80, cube);
+						cube->setScale(cubeScale);
 
-					//std::cout << "Added cube" << std::endl;
-					// std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
+						cube->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step)));
+						//std::cout << "position: " << glm::to_string(glm::vec3(xPos + (xoffSet * step), yPos - (yoffSet * step), zPos + (zoffSet * step))) << "offset: " << glm::to_string(positionOffset) << std::endl;
+						//cube->setRotation(cube->getPitchYawRoll() + rotationOffset);
+						//std::cout << xPos + ((float) x * step) << ", " << yPos - ((float) y * step) << ", " << zPos + ((float) z * step) << std::endl;
+						cubes.insert(cube);
+						if (x == 0 && y == 0 && z == (zSize - 1)) {
+							firstCube = cube;
+							divx = xoffSet * step;
+							divy = yoffSet * step;
+							divz = zoffSet * step;
 
+						}
+
+						//std::cout << "Added cube" << std::endl;
+						// std::cout << "x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
 				}
 			}
 		}
@@ -356,20 +386,20 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 					if (x == 0 && z == (zSize - 1) && yDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 						label->setPosition(glm::vec3(xPos + ((xoffSet - 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
-						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale * 1.1);
 						std::string str = yLabels[y];
 
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.0, 0.0), 100, label);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5), 100, label);
 						labels.insert(label);
 					}
 					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 					
 						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
-						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale * 1.1);
 
 						std::string str = xLabels[x];
@@ -378,19 +408,19 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						}
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 1.0, 0.0), 100, label);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 1.0, 0.5), 100, label);
 						labels.insert(label);
 					}
 					
 					if (y == (ySize - 1) && x == 0 && zDim) {
 						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
-						label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale * 1.1);
 						std::string str = zLabels[z];
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.0, 0.0, 1.0), 100, label);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 0.5, 1.0), 100, label);
 						labels.insert(label);
 					}
 					// std::cout << "label x: " << x << "/" << xSize << ", y: " << y << "/" << ySize << std::endl;
@@ -556,18 +586,26 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 	float stepAngle = 5.0f / 360.0f;
 
 	// Quit if the escape button is pressed
-
+	
+	if ((event.getName() == "HTC_Controller_0" || event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Right" || event.getName() == "HTC_Controller_Left") && (controller1 == "" || controller2 == "")) {
+		if (controller1 == "") {
+			controller1 = event.getName();
+		} else {
+			controller2 = event.getName();
+		}
+	}
+	
 	if (event.getName() != "HTC_HMD_1" && event.getName() != "HTC_TrackingReference_1" && event.getName() != "HTC_TrackingReference_2" && event.getName() != "HTC_Controller_1" && event.getName() != "HTC_Controller_2" && event.getName() != "HTC_Controller_Right" && event.getName() != "HTC_Controller_Left" && event.getName() != "FrameStart") {
-		// std::cout << event.getName() << std::endl;
+		 std::cout << event.getName() << std::endl;
 	}
 	if (event.getName() == "HTC_HMD_1") {
 		if (!hmd) {
 			hmd = true;
 			maxCubeScale = 1.0;
-			initialPoint.y = 1.0;
-			initialPoint.x = -0.5;
+			//initialPoint.y = 1.0;
+			//initialPoint.x = -0.5;
 		}
-	} else if (event.getName() == "HTC_Controller_Right_Axis1Button_Pressed" || event.getName() == "HTC_Controller_1_Axis1Button_Pressed") {
+	} else if (event.getName() == (controller1 + "_Axis1Button_Pressed")) {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{
@@ -578,7 +616,11 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 			rotationStart = rotation;
 			dragging = true;
 		}
-	} else if (event.getName() == "HTC_Controller_Right_Axis1Button_Released" || event.getName() == "HTC_Controller_1_Axis1Button_Released") {
+	} else if (event.getName() == (controller1 + "_GripButton_Pressed")) {
+		std::cout << "controller1" << std::endl;
+	} else if (event.getName() == (controller2 + "_GripButton_Pressed")) {
+		std::cout << "controller2" << std::endl;
+	} else if (event.getName() == (controller1 + "_Axis1Button_Released")) {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{
@@ -590,15 +632,15 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		}
 	} else if (event.getName() == "KbdEsc_Down") {
 		shutdown();
-	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down" || event.getName() == "HTC_Controller_Left_Axis0Button_Pressed" || event.getName() == "HTC_Controller_0_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdLeft_Down" || event.getName() == "KbdDown_Down" || event.getName() == (controller2 + "_Axis0Button_Pressed")) { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		if (_stage > 0)
 			_stage--;
 		updateStage();
-	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down" || event.getName() == "HTC_Controller_Right_Axis0Button_Pressed" || event.getName() == "HTC_Controller_1_Axis0Button_Pressed") { // && event.getDataAsCharArray("EventString")[0] == 'D'
+	} else if (event.getName() == "KbdRight_Down" || event.getName() == "KbdUp_Down" || event.getName() == (controller1 + "_Axis0Button_Pressed")) { // && event.getDataAsCharArray("EventString")[0] == 'D'
 		_stage++;
 		updateStage();
 	}
-	else if (event.getName() == "HTC_Controller_2" || event.getName() == "HTC_Controller_Left") {
+	else if (event.getName() == controller2) {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{
@@ -608,7 +650,7 @@ void DemoVRApp::onVREvent(const MinVR::VREvent &event) {
 		}
 
 	}
-	else if (event.getName() == "HTC_Controller_1" || event.getName() == "HTC_Controller_Right") {
+	else if (event.getName() == controller1) {
 		std::vector<std::string> fields = event.getDataFields();
 		if (std::find(fields.begin(), fields.end(), "Pose") != fields.end())
 		{

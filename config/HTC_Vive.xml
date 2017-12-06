@@ -17,8 +17,8 @@
 	  <ContextVersionMinor>3</ContextVersionMinor>
 	  <UseGPUAffinity>1</UseGPUAffinity>
 	  <UseDebugContext>0</UseDebugContext>
-	  <MSAASamples>1</MSAASamples>
-	  <QuadBuffered>0</QuadBuffered>
+	  <MSAASamples>2</MSAASamples>
+	  <QuadBuffered>1</QuadBuffered>
 	  
 	  <StereoFormat>Mono</StereoFormat>
   
