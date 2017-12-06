@@ -312,7 +312,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 
 					bsg::drawableCube *cube = new bsg::drawableCube(_shader, 10,
 						glm::vec4(0.5f, 0.5f, 0.8f, 1.0f));
-						std::string dbl = "\n\n  " + formatWithCommas(arr[x][y][z]);
+						std::string dbl = "\n\n  $" + formatWithCommas(arr[x][y][z]);
 						// Fumeng : the previous line was "arr[y][x][z]", and I don't know why...
 
 						//if (xDim && yDim && zDim) {
