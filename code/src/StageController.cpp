@@ -19,7 +19,7 @@ StageController::~StageController() {
 }
 
 void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & arr, int stage) {
-	stage = (stage + 9) % 9;
+	stage = (stage + 14) % 14;
 	std::cout << "----stage: "<< stage << std::endl;
 
 	switch (stage) {
@@ -49,6 +49,21 @@ void StageController::setUpDimsArr(vector<Dimension<string> > & dims, Array3D & 
 		break;
 	case 8:
 		stage8(dims);
+		break;
+	case 9:
+		stage9(dims);
+		break;
+	case 10:
+		stage10(dims);
+		break;
+	case 11:
+		stage11(dims);
+		break;
+	case 12:
+		stage12(dims);
+		break;
+	case 13:
+		stage13(dims);
 		break;
 	}
 
@@ -105,7 +120,7 @@ void StageController::stage4(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
 			"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year',"
 		    "KPI_CATEGORY_COARSE_X as 'Money_Category',"
-			"REG_ABBREV_C as 'Account_Type',"
+			//"REG_ABBREV_C as 'Account_Type',"
 			"MAX(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
 			"FROM BDC_TXN_FACT_MA_MORE as base, BDC_KPI_DIM_MORE as kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
 			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
@@ -118,9 +133,35 @@ void StageController::stage4(vector<Dimension<string> > & dims) {
 }
 void StageController::stage5(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
+		"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year',"
+		"KPI_CATEGORY_COARSE_X as 'Money_Category',"
+		"REG_ABBREV_C as 'Account_Type',"
+		"MAX(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
+		"FROM BDC_TXN_FACT_MA_MORE as base, BDC_KPI_DIM_MORE as kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
+		"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+		"AND KPI_BUSINESS_NM = 'New_money' "
+		"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D,'%Y'), KPI_CATEGORY_COARSE_X "
+		"ORDER BY 'Year';";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+}
+void StageController::stage6(vector<Dimension<string> > & dims) {
+	string sql = "SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
+		"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI "
+		"WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y') "
+		"ORDER BY 'Year';";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+
+}
+
+void StageController::stage7(vector<Dimension<string> > & dims) {
+	string sql = "SELECT "
 		    "DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year', "
 			"DATE_FORMAT (SNAPSHOT_D,  '%m') as 'Month', "
-			"REG_ABBREV_C as 'Account_Type', "
+			//"REG_ABBREV_C as 'Account_Type', "
 			"AVG(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
 			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
 			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
@@ -134,12 +175,41 @@ void StageController::stage5(vector<Dimension<string> > & dims) {
 
 }
 
-void StageController::stage6(vector<Dimension<string> > & dims) {
+void StageController::stage8(vector<Dimension<string> > & dims) {
+	string sql = "SELECT "
+		"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year', "
+		"DATE_FORMAT (SNAPSHOT_D,  '%m') as 'Month',"
+		"REG_ABBREV_C as 'Account_Type',"
+		"AVG(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
+		"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
+		"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+		"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
+		"AND KPI_BUSINESS_NM = 'New_money' "
+		// "AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y%m') "
+		"ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m') ;";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+}
+
+void StageController::stage9(vector<Dimension<string> > & dims) {
+	string sql = "SELECT DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
+		"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE KPI "
+		"WHERE base.KPI_TYPE_ID = KPI.KPI_TYPE_ID "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y') "
+		"ORDER BY 'Year';";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+
+}
+
+void StageController::stage10(vector<Dimension<string> > & dims) {
+		
 	string sql = "SELECT "
 			"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',"
-		    "AGE_BKT as 'Age',"
+			"AGE_BKT as 'Age',"
 			"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
-			"KPI_CATEGORY_COARSE_X as 'Money_Category', "
+			//"KPI_CATEGORY_COARSE_X as 'Money_Category', "
 			"KPI_BUSINESS_NM as 'Business' "
 			"FROM BDC_TXN_FACT_MA_MORE base,BDC_KPI_DIM kpi, BDC_HOUSEHOLD_DEMOG demog, BDC_ACCOUNT_MINI_DIM mini_dim, BDC_INDIVIDUAL_MINI_DIM indi "
 			"WHERE     base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
@@ -148,31 +218,58 @@ void StageController::stage6(vector<Dimension<string> > & dims) {
 			"AND KPI_BUSINESS_NM = 'New_money' "
 			"AND REG_ABBREV_C ='IRA' "
 			"AND base.IP_MINI_DIM_ID = indi.IP_MINI_DIM_ID "
-			"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+			//"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
 			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), AGE_BKT "
 			"ORDER BY AGE_BKT,DATE_FORMAT (SNAPSHOT_D, '%m');";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
 
-void StageController::stage7(vector<Dimension<string> > & dims) {
-		string sql = "SELECT "
-			"DATE_FORMAT (SNAPSHOT_D,  '%Y') as 'Year', "
-			"DATE_FORMAT (SNAPSHOT_D,  '%m') as 'Month',"
-			"REG_ABBREV_C as 'Account_Type',"
-			"AVG(ACCT_KPI_TYPE_TXN_VAL) as 'Value' "
-			"FROM BDC_TXN_FACT_MA_MORE base, BDC_KPI_DIM_MORE kpi, BDC_ACCOUNT_MINI_DIM mini_dim "
-			"WHERE base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
-			"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
-			"AND KPI_BUSINESS_NM = 'New_money' "
-			// "AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
-			"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y%m') "
-			"ORDER BY DATE_FORMAT (SNAPSHOT_D, '%m') ;";
+void StageController::stage11(vector<Dimension<string> > & dims) {
+
+	string sql = "SELECT "
+		"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',"
+		"AGE_BKT as 'Age',"
+		"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
+		"KPI_CATEGORY_COARSE_X as 'Money_Category', "
+		"KPI_BUSINESS_NM as 'Business' "
+		"FROM BDC_TXN_FACT_MA_MORE base,BDC_KPI_DIM kpi, BDC_HOUSEHOLD_DEMOG demog, BDC_ACCOUNT_MINI_DIM mini_dim, BDC_INDIVIDUAL_MINI_DIM indi "
+		"WHERE     base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+		"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
+		"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
+		"AND KPI_BUSINESS_NM = 'New_money' "
+		"AND REG_ABBREV_C ='IRA' "
+		"AND base.IP_MINI_DIM_ID = indi.IP_MINI_DIM_ID "
+		//"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), AGE_BKT "
+		"ORDER BY AGE_BKT,DATE_FORMAT (SNAPSHOT_D, '%m');";
 	dims = vector<Dimension<string> >();
 	_adapter.getResult(sql, dims);
 }
 
-void StageController::stage8(vector<Dimension<string> > & dims) {
+void StageController::stage12(vector<Dimension<string> > & dims) {
+
+	string sql = "SELECT "
+		"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',"
+		"AGE_BKT as 'Age',"
+		"SUM(ACCT_KPI_TYPE_TXN_VAL) as 'Value',"
+		"KPI_CATEGORY_COARSE_X as 'Money_Category', "
+		"KPI_BUSINESS_NM as 'Business' "
+		"FROM BDC_TXN_FACT_MA_MORE base,BDC_KPI_DIM kpi, BDC_HOUSEHOLD_DEMOG demog, BDC_ACCOUNT_MINI_DIM mini_dim, BDC_INDIVIDUAL_MINI_DIM indi "
+		"WHERE     base.KPI_TYPE_ID = kpi.KPI_TYPE_ID "
+		"AND base.HH_DEMOG_ID = demog.HH_DEMOG_ID "
+		"AND mini_dim.ACCT_MINI_DIM_ID = base.ACCT_MINI_DIM_ID "
+		"AND KPI_BUSINESS_NM = 'New_money' "
+		"AND REG_ABBREV_C ='IRA' "
+		"AND base.IP_MINI_DIM_ID = indi.IP_MINI_DIM_ID "
+		"AND SNAPSHOT_D >= '2017-01-01' AND SNAPSHOT_D <= '2017-12-31' "
+		"GROUP BY DATE_FORMAT (SNAPSHOT_D, '%Y'), AGE_BKT "
+		"ORDER BY AGE_BKT,DATE_FORMAT (SNAPSHOT_D, '%m');";
+	dims = vector<Dimension<string> >();
+	_adapter.getResult(sql, dims);
+}
+
+void StageController::stage13(vector<Dimension<string> > & dims) {
 	string sql = "SELECT "
 		//"IN_RADIUS_BRANCH_NM as 'Region_Branch',"
 		"DATE_FORMAT (SNAPSHOT_D, '%Y') as 'Year',"

@@ -32,6 +32,12 @@ private:
 	void stage6(vector<Dimension<string> > & dims);
 	void stage7(vector<Dimension<string> > & dims);
 	void stage8(vector<Dimension<string> > & dims);
+	void stage9(vector<Dimension<string> > & dims);
+	void stage10(vector<Dimension<string> > & dims);
+	void stage11(vector<Dimension<string> > & dims);
+	void stage12(vector<Dimension<string> > & dims);
+	void stage13(vector<Dimension<string> > & dims);
+
 	void computeValueArray(vector<Dimension<string> > & dims, Array3D & arr);
 	DataAdapter _adapter;
 };

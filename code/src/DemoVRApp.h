@@ -84,6 +84,7 @@ private:
 	void updateScene();
 	void updateCubes();
 	void processKeys(unsigned char key);
+	std::string getMonth(std::string str);
 
 public:
 	void ft_drawString(char * filename, char * text, glm::vec3 color, int fontSize, char side, bsg::drawableCube *cube);

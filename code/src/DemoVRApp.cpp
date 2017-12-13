@@ -269,6 +269,21 @@ void DemoVRApp::processKeys(unsigned char key) {
 	}
 }
 
+std::string DemoVRApp::getMonth(std::string str) {
+	if (str == "01") return "Jan";
+	if (str == "02") return "Feb";
+	if (str == "03") return "Mar";
+	if (str == "04") return "Apr";
+	if (str == "05") return "May";
+	if (str == "06") return "Jun";
+	if (str == "07") return "Jul";
+	if (str == "08") return "Aug";
+	if (str == "09") return "Sep";
+	if (str == "10") return "Oct";
+	if (str == "11") return "Nov";
+	if (str == "12") return "Dec";
+	return str;
+}
 
 void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 	int numDims = dims.size();
@@ -298,10 +313,10 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		float zPos = initialPoint.z;
 		float step = cubeScale * 1.1;
 		std::cout << "Position offset: " << glm::to_string(positionOffset) << std::endl;
-		bsg::drawableCube *start = new bsg::drawableCube(_shader, 10, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-		start->setScale(cubeScale / 4);
-		start->setPosition(initialPoint);
-		cubes.insert(start);
+		//bsg::drawableCube *start = new bsg::drawableCube(_shader, 10, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		//start->setScale(cubeScale / 4);
+		//start->setPosition(initialPoint);
+		//cubes.insert(start);
 		for (int x = 0; x < xSize; x++) {
 			for (int y = 0; y < ySize; y++) {
 				for (int z = 0; z < zSize; z++) {
@@ -352,6 +367,8 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 		std::set<std::string> knownY;
 		std::vector<std::string> zLabels;
 		std::set<std::string> knownZ;
+
+
 		for (int x = 0; x < dims[0].getSize(); x++) {
 			std::string str = " "; int f = 1;
 			dims[0].getValueAt(x, str, f);
@@ -366,6 +383,7 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 			if (knownY.find(str) == knownY.end()) {
 				yLabels.push_back(str);
 				knownY.insert(str);
+				std::cout << "KnownY: " << str << std::endl;
 			}
 		}
 		for (int x = 0; x < dims[2].getSize(); x++) {
@@ -389,10 +407,62 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale * 1.1);
 						std::string str = yLabels[y];
+						if (dims[1].getName() == "Month") {
+							str = getMonth(str);
+						}
+						std::cout << "Drawing Y" << str << std::endl;
 
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
-						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5),00, label);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5),100, label);
+						labels.insert(label);
+					}
+					if (x == (xSize - 1) && z == (zSize - 1) && yDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(-0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, 0.5), glm::vec3(-0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + ((xoffSet + 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale * 1.1);
+						std::string str = yLabels[y];
+						if (dims[1].getName() == "Month") {
+							str = getMonth(str);
+						}
+						std::cout << "Drawing Y" << str << std::endl;
+
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5), 100, label);
+						labels.insert(label);
+					}
+					if (x == 0 && z == 0 && yDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, -0.5), glm::vec3(0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + ((xoffSet - 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale * 1.1);
+						std::string str = yLabels[y];
+						if (dims[1].getName() == "Month") {
+							str = getMonth(str);
+						}
+						std::cout << "Drawing Y" << str << std::endl;
+
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5), 100, label);
+						labels.insert(label);
+					}
+					if (x == (xSize - 1) && z == 0 && yDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, -0.5), glm::vec3(0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + ((xoffSet + 1) * step), yPos - (yoffSet * step), zPos + (zoffSet * step)) + positionOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale * 1.1);
+						std::string str = yLabels[y];
+						if (dims[1].getName() == "Month") {
+							str = getMonth(str);
+						}
+						std::cout << "Drawing Y" << str << std::endl;
+
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(1.0, 0.5, 0.5), 100, label);
 						labels.insert(label);
 					}
 					if (y == (ySize - 1) && z == (zSize - 1) && xDim) {
@@ -406,6 +476,31 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						if (str == "") {
 							str = " ";
 						}
+						if (dims[0].getName() == "Month") {
+							std::cout << "STRING: " << str << std::endl;
+							str = getMonth(str);
+						}
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 1.0, 0.5), 100, label);
+						labels.insert(label);
+					}
+
+					if (y == (ySize - 1) && z == 0 && xDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(0.5, 0.5, -0.5), glm::vec3(-0.5, 0.5, -0.5), glm::vec3(0.5, -0.5, -0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale * 1.1);
+
+						std::string str = xLabels[x];
+						if (str == "") {
+							str = " ";
+						}
+						if (dims[0].getName() == "Month") {
+							std::cout << "STRING: " << str << std::endl;
+							str = getMonth(str);
+						}
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 1.0, 0.5), 100, label);
@@ -418,6 +513,24 @@ void DemoVRApp::dataToCubes(vector<Dimension<string> >& dims, Array3D& arr) {
 						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
 						label->setScale(cubeScale * 1.1);
 						std::string str = zLabels[z];
+						if (dims[2].getName() == "Month") {
+							str = getMonth(str);
+						}
+						std::vector<char> char_array(str.begin(), str.end());
+						char_array.push_back(0);
+						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 0.5, 1.0), 100, label);
+						labels.insert(label);
+					}
+
+					if (y == (ySize - 1) && x == (xSize - 1) && zDim) {
+						bsg::drawableSquare* label = new bsg::drawableSquare(_shader, 10, glm::vec3(0.5, 0.5, 0.5), glm::vec3(0.5, 0.5, -0.5), glm::vec3(0.5, -0.5, 0.5), glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+						label->setPosition(glm::vec3(xPos + (xoffSet * step), yPos - ((yoffSet + 1) * step), zPos + (zoffSet * step)) + positionOffset);
+						//label->setRotation(label->getPitchYawRoll() + rotationOffset);
+						label->setScale(cubeScale * 1.1);
+						std::string str = zLabels[z];
+						if (dims[2].getName() == "Month") {
+							str = getMonth(str);
+						}
 						std::vector<char> char_array(str.begin(), str.end());
 						char_array.push_back(0);
 						ft_drawString("../fonts/times.ttf", &char_array[0], glm::vec3(0.5, 0.5, 1.0), 100, label);
